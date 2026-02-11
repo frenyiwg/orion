@@ -1,0 +1,535 @@
+{
+  "data": [
+    {
+      "id": "emp-0001",
+      "employeeCode": "E-10001",
+      "status": "ACTIVE",
+      "personal": {
+        "firstName": "Ana",
+        "middleName": "María",
+        "lastName": "Gómez",
+        "secondLastName": "Pérez",
+        "preferredName": "Ani",
+        "gender": "FEMALE",
+        "maritalStatus": "SINGLE",
+        "birthDate": "1996-04-18",
+        "nationality": "DO",
+        "identification": {
+          "type": "CEDULA",
+          "number": "001-1234567-8",
+          "issuedCountry": "DO",
+          "expiresAt": null
+        }
+      },
+      "contact": {
+        "emails": [
+          { "type": "WORK", "value": "ana.gomez@company.com", "isPrimary": true },
+          { "type": "PERSONAL", "value": "ana.gomez@gmail.com", "isPrimary": false }
+        ],
+        "phones": [
+          {
+            "type": "MOBILE",
+            "countryCode": "+1",
+            "number": "8095551122",
+            "ext": null,
+            "isPrimary": true,
+            "verifiedAt": "2025-10-02T14:20:00Z"
+          },
+          {
+            "type": "HOME",
+            "countryCode": "+1",
+            "number": "8295559988",
+            "ext": null,
+            "isPrimary": false
+          }
+        ],
+        "preferredLanguage": "es",
+        "timeZone": "America/Santo_Domingo"
+      },
+      "addresses": [
+        {
+          "id": "addr-1001",
+          "type": "HOME",
+          "label": "Residencia principal",
+          "isPrimary": true,
+          "line1": "Calle Duarte #12",
+          "line2": "Apto 3B",
+          "sector": "Gazcue",
+          "city": "Santo Domingo",
+          "state": "Distrito Nacional",
+          "postalCode": "10204",
+          "country": "DO",
+          "geo": { "lat": 18.4761, "lng": -69.9312 },
+          "validFrom": "2021-06-01",
+          "validTo": null,
+          "notes": "Dejar con conserje si no contesta."
+        },
+        {
+          "id": "addr-1002",
+          "type": "WORK",
+          "label": "Oficina HQ",
+          "isPrimary": false,
+          "line1": "Av. Winston Churchill",
+          "line2": "Torre Empresarial, Piso 8",
+          "sector": "Piantini",
+          "city": "Santo Domingo",
+          "state": "Distrito Nacional",
+          "postalCode": "10147",
+          "country": "DO",
+          "geo": { "lat": 18.4637, "lng": -69.9431 },
+          "validFrom": "2023-02-15",
+          "validTo": null,
+          "notes": "Recepción, entregar a RRHH."
+        },
+        {
+          "id": "addr-1003",
+          "type": "SHIPPING",
+          "label": "Envíos",
+          "isPrimary": false,
+          "line1": "Calle César Nicolás Penson #44",
+          "line2": "Casa 2",
+          "sector": "Naco",
+          "city": "Santo Domingo",
+          "state": "Distrito Nacional",
+          "postalCode": "10116",
+          "country": "DO",
+          "geo": null,
+          "validFrom": "2024-08-01",
+          "validTo": null,
+          "notes": "Paquetes del trabajo, horario 9am-6pm."
+        }
+      ],
+      "employment": {
+        "company": "Orion Tech",
+        "department": "Engineering",
+        "team": "Frontend",
+        "position": "Senior Frontend Engineer",
+        "jobLevel": "L4",
+        "employmentType": "FULL_TIME",
+        "workMode": "HYBRID",
+        "hireDate": "2022-03-07",
+        "terminationDate": null,
+        "managerId": "emp-0004",
+        "location": {
+          "siteId": "site-sdq-01",
+          "name": "Santo Domingo HQ",
+          "country": "DO"
+        },
+        "schedule": {
+          "weeklyHours": 40,
+          "shift": "DAY",
+          "workDays": ["MON", "TUE", "WED", "THU", "FRI"]
+        }
+      },
+      "compensation": {
+        "currency": "DOP",
+        "baseSalary": 180000,
+        "payFrequency": "MONTHLY",
+        "bonusEligible": true,
+        "bonusTargetPercent": 10,
+        "bankAccounts": [
+          {
+            "id": "bank-1",
+            "bankName": "Banco Popular",
+            "accountType": "SAVINGS",
+            "accountNumberMasked": "****4321",
+            "isPrimary": true
+          }
+        ]
+      },
+      "benefits": {
+        "healthPlan": { "provider": "Humano", "planName": "Premium", "memberId": "HUM-88991" },
+        "pension": { "provider": "AFP Popular", "memberId": "AFP-10001" }
+      },
+      "emergencyContacts": [
+        {
+          "name": "Carlos Pérez",
+          "relationship": "BROTHER",
+          "phone": { "countryCode": "+1", "number": "8095557788" },
+          "email": "carlos.perez@gmail.com",
+          "isPrimary": true
+        }
+      ],
+      "documents": [
+        {
+          "type": "CONTRACT",
+          "fileName": "contract_emp-0001.pdf",
+          "status": "SIGNED",
+          "signedAt": "2022-03-05T10:30:00Z"
+        },
+        {
+          "type": "ID",
+          "fileName": "cedula_emp-0001.jpg",
+          "status": "VERIFIED",
+          "verifiedAt": "2022-03-02T09:00:00Z"
+        }
+      ],
+      "assets": [
+        {
+          "type": "LAPTOP",
+          "tag": "IT-8892",
+          "model": "MacBook Pro 14",
+          "assignedAt": "2022-03-08"
+        },
+        { "type": "BADGE", "tag": "BDG-10001", "assignedAt": "2022-03-07" }
+      ],
+      "permissions": {
+        "roles": ["EMPLOYEE", "ENGINEERING"],
+        "systems": [
+          { "name": "Jira", "access": "STANDARD" },
+          { "name": "GitLab", "access": "MAINTAINER" }
+        ]
+      },
+      "audit": {
+        "createdAt": "2022-03-01T12:00:00Z",
+        "createdBy": "hr-01",
+        "updatedAt": "2025-11-22T15:10:00Z",
+        "updatedBy": "hr-02"
+      }
+    },
+    {
+      "id": "emp-0002",
+      "employeeCode": "E-10002",
+      "status": "ACTIVE",
+      "personal": {
+        "firstName": "Luis",
+        "middleName": "Alberto",
+        "lastName": "Martínez",
+        "secondLastName": "Santos",
+        "preferredName": "Lucho",
+        "gender": "MALE",
+        "maritalStatus": "MARRIED",
+        "birthDate": "1991-09-02",
+        "nationality": "DO",
+        "identification": {
+          "type": "CEDULA",
+          "number": "001-9876543-1",
+          "issuedCountry": "DO",
+          "expiresAt": null
+        }
+      },
+      "contact": {
+        "emails": [
+          { "type": "WORK", "value": "luis.martinez@company.com", "isPrimary": true },
+          { "type": "PERSONAL", "value": "lmartinez@yahoo.com", "isPrimary": false }
+        ],
+        "phones": [
+          {
+            "type": "MOBILE",
+            "countryCode": "+1",
+            "number": "8295553344",
+            "ext": null,
+            "isPrimary": true
+          },
+          {
+            "type": "WORK",
+            "countryCode": "+1",
+            "number": "8095551100",
+            "ext": "220",
+            "isPrimary": false
+          }
+        ],
+        "preferredLanguage": "es",
+        "timeZone": "America/Santo_Domingo"
+      },
+      "addresses": [
+        {
+          "id": "addr-2001",
+          "type": "HOME",
+          "label": "Casa",
+          "isPrimary": true,
+          "line1": "Calle 27 de Febrero #210",
+          "line2": "Residencial Palma Real",
+          "sector": "Los Prados",
+          "city": "Santo Domingo",
+          "state": "Distrito Nacional",
+          "postalCode": "10108",
+          "country": "DO",
+          "geo": null,
+          "validFrom": "2019-01-10",
+          "validTo": null,
+          "notes": null
+        },
+        {
+          "id": "addr-2002",
+          "type": "TEMPORARY",
+          "label": "Proyecto Santiago (3 meses)",
+          "isPrimary": false,
+          "line1": "Av. Estrella Sadhalá #55",
+          "line2": "Apto 12A",
+          "sector": "Los Jardines",
+          "city": "Santiago",
+          "state": "Santiago",
+          "postalCode": "51000",
+          "country": "DO",
+          "geo": null,
+          "validFrom": "2025-01-15",
+          "validTo": "2025-04-15",
+          "notes": "Dirección temporal por asignación."
+        },
+        {
+          "id": "addr-2003",
+          "type": "SHIPPING",
+          "label": "Envíos a esposa",
+          "isPrimary": false,
+          "line1": "Calle Las Damas #9",
+          "line2": null,
+          "sector": "Zona Colonial",
+          "city": "Santo Domingo",
+          "state": "Distrito Nacional",
+          "postalCode": "10210",
+          "country": "DO",
+          "geo": null,
+          "validFrom": "2023-06-01",
+          "validTo": null,
+          "notes": "Entregar a recepción, nombre: Laura Santos."
+        }
+      ],
+      "employment": {
+        "company": "Orion Tech",
+        "department": "Data",
+        "team": "Analytics",
+        "position": "Data Analyst",
+        "jobLevel": "L2",
+        "employmentType": "FULL_TIME",
+        "workMode": "ONSITE",
+        "hireDate": "2020-10-19",
+        "terminationDate": null,
+        "managerId": "emp-0005",
+        "location": { "siteId": "site-sdq-01", "name": "Santo Domingo HQ", "country": "DO" },
+        "schedule": {
+          "weeklyHours": 40,
+          "shift": "DAY",
+          "workDays": ["MON", "TUE", "WED", "THU", "FRI"]
+        }
+      },
+      "compensation": {
+        "currency": "DOP",
+        "baseSalary": 95000,
+        "payFrequency": "MONTHLY",
+        "bonusEligible": false,
+        "bonusTargetPercent": 0,
+        "bankAccounts": [
+          {
+            "id": "bank-2",
+            "bankName": "Banreservas",
+            "accountType": "CHECKING",
+            "accountNumberMasked": "****9910",
+            "isPrimary": true
+          }
+        ]
+      },
+      "benefits": {
+        "healthPlan": { "provider": "Mapfre", "planName": "Gold", "memberId": "MAP-55301" },
+        "pension": { "provider": "AFP Reservas", "memberId": "AFP-10002" }
+      },
+      "emergencyContacts": [
+        {
+          "name": "Laura Santos",
+          "relationship": "SPOUSE",
+          "phone": { "countryCode": "+1", "number": "8295557766" },
+          "email": "laura.santos@gmail.com",
+          "isPrimary": true
+        }
+      ],
+      "documents": [
+        {
+          "type": "CONTRACT",
+          "fileName": "contract_emp-0002.pdf",
+          "status": "SIGNED",
+          "signedAt": "2020-10-15T12:00:00Z"
+        }
+      ],
+      "assets": [
+        {
+          "type": "LAPTOP",
+          "tag": "IT-9011",
+          "model": "Dell Latitude 5440",
+          "assignedAt": "2020-10-20"
+        }
+      ],
+      "permissions": {
+        "roles": ["EMPLOYEE", "DATA"],
+        "systems": [
+          { "name": "PowerBI", "access": "STANDARD" },
+          { "name": "Confluence", "access": "STANDARD" }
+        ]
+      },
+      "audit": {
+        "createdAt": "2020-10-10T09:00:00Z",
+        "createdBy": "hr-01",
+        "updatedAt": "2025-09-18T13:40:00Z",
+        "updatedBy": "hr-03"
+      }
+    },
+    {
+      "id": "emp-0003",
+      "employeeCode": "E-10003",
+      "status": "ON_LEAVE",
+      "personal": {
+        "firstName": "Carolina",
+        "middleName": null,
+        "lastName": "Ramírez",
+        "secondLastName": "De León",
+        "preferredName": "Caro",
+        "gender": "FEMALE",
+        "maritalStatus": "DIVORCED",
+        "birthDate": "1988-12-11",
+        "nationality": "DO",
+        "identification": {
+          "type": "PASSPORT",
+          "number": "RD1234567",
+          "issuedCountry": "DO",
+          "expiresAt": "2029-12-10"
+        }
+      },
+      "contact": {
+        "emails": [
+          { "type": "WORK", "value": "carolina.ramirez@company.com", "isPrimary": true },
+          { "type": "PERSONAL", "value": "caroramirez@hotmail.com", "isPrimary": false }
+        ],
+        "phones": [
+          {
+            "type": "MOBILE",
+            "countryCode": "+1",
+            "number": "8095552211",
+            "ext": null,
+            "isPrimary": true
+          }
+        ],
+        "preferredLanguage": "es",
+        "timeZone": "America/Santo_Domingo"
+      },
+      "addresses": [
+        {
+          "id": "addr-3001",
+          "type": "HOME",
+          "label": "Residencia",
+          "isPrimary": true,
+          "line1": "Calle Jacinto Mañón #18",
+          "line2": "Apto 5C",
+          "sector": "Ensanche Julieta",
+          "city": "Santo Domingo",
+          "state": "Distrito Nacional",
+          "postalCode": "10134",
+          "country": "DO",
+          "geo": null,
+          "validFrom": "2022-05-01",
+          "validTo": null,
+          "notes": null
+        },
+        {
+          "id": "addr-3002",
+          "type": "WORK",
+          "label": "Sucursal Norte",
+          "isPrimary": false,
+          "line1": "Av. John F. Kennedy Km 7",
+          "line2": "Edif. Norte, Local 3",
+          "sector": "Arroyo Hondo",
+          "city": "Santo Domingo",
+          "state": "Distrito Nacional",
+          "postalCode": "11113",
+          "country": "DO",
+          "geo": null,
+          "validFrom": "2023-09-10",
+          "validTo": null,
+          "notes": "Entrega en almacén."
+        }
+      ],
+      "employment": {
+        "company": "Orion Tech",
+        "department": "People",
+        "team": "HR Ops",
+        "position": "HR Specialist",
+        "jobLevel": "L3",
+        "employmentType": "FULL_TIME",
+        "workMode": "HYBRID",
+        "hireDate": "2018-02-05",
+        "terminationDate": null,
+        "managerId": "emp-0006",
+        "location": { "siteId": "site-sdq-01", "name": "Santo Domingo HQ", "country": "DO" },
+        "schedule": {
+          "weeklyHours": 40,
+          "shift": "DAY",
+          "workDays": ["MON", "TUE", "WED", "THU", "FRI"]
+        },
+        "leave": {
+          "type": "MATERNITY",
+          "startDate": "2026-01-12",
+          "endDate": "2026-04-06",
+          "notes": "Licencia aprobada por RRHH."
+        }
+      },
+      "compensation": {
+        "currency": "DOP",
+        "baseSalary": 120000,
+        "payFrequency": "MONTHLY",
+        "bonusEligible": true,
+        "bonusTargetPercent": 8,
+        "bankAccounts": [
+          {
+            "id": "bank-3",
+            "bankName": "BHD",
+            "accountType": "SAVINGS",
+            "accountNumberMasked": "****2008",
+            "isPrimary": true
+          }
+        ]
+      },
+      "benefits": {
+        "healthPlan": { "provider": "Humano", "planName": "Standard", "memberId": "HUM-22019" },
+        "pension": { "provider": "AFP Popular", "memberId": "AFP-10003" }
+      },
+      "emergencyContacts": [
+        {
+          "name": "Miguel De León",
+          "relationship": "PARENT",
+          "phone": { "countryCode": "+1", "number": "8295554441" },
+          "email": "miguel.deleon@gmail.com",
+          "isPrimary": true
+        }
+      ],
+      "documents": [
+        {
+          "type": "ID",
+          "fileName": "passport_emp-0003.pdf",
+          "status": "VERIFIED",
+          "verifiedAt": "2019-04-22T09:30:00Z"
+        },
+        {
+          "type": "LEAVE_APPROVAL",
+          "fileName": "leave_emp-0003.pdf",
+          "status": "APPROVED",
+          "signedAt": "2026-01-05T16:00:00Z"
+        }
+      ],
+      "assets": [
+        {
+          "type": "LAPTOP",
+          "tag": "IT-7012",
+          "model": "HP EliteBook 840",
+          "assignedAt": "2019-06-11"
+        },
+        {
+          "type": "HEADSET",
+          "tag": "IT-7012-HS",
+          "model": "Jabra Evolve",
+          "assignedAt": "2022-09-01"
+        }
+      ],
+      "permissions": {
+        "roles": ["EMPLOYEE", "HR"],
+        "systems": [
+          { "name": "HRIS", "access": "ADMIN" },
+          { "name": "Slack", "access": "STANDARD" }
+        ]
+      },
+      "audit": {
+        "createdAt": "2018-01-20T10:00:00Z",
+        "createdBy": "hr-00",
+        "updatedAt": "2026-01-05T16:10:00Z",
+        "updatedBy": "hr-06"
+      }
+    }
+  ]
+}

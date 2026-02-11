@@ -1,1 +1,14 @@
-<p>Welcome to the home page!</p>
+<div data-testid="home-page" className="flex flex-col gap-8 @container">
+  <div className="grid grid-cols-1 @4xl:grid-cols-[1fr_320px] gap-6 laptop:gap-3 items-start">
+    <div className="flex flex-col gap-6 self-start">
+      <div data-testid="greeting-section">
+        <h3 data-testid="greeting-title" className="text-h3 font-semibold text-heading">
+          {{ greetingTime }}, {{ user()?.name }}
+        </h3>
+        <p data-testid="greeting-description" className="text-body font-normal">
+          Visualiza las últimas actualizaciones de tu institución.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
