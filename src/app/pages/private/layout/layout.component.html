@@ -1,0 +1,16 @@
+<div class="min-h-screen bg-neutral-foreground flex">
+  <app-sidebar class="h-auto" />
+
+  <!-- Main -->
+  <main class="flex-1 flex flex-col">
+    <!-- Header -->
+    <header class="h-16 bg-neutral-foreground border-b border-neutral-200 flex items-center px-6">
+      <app-breadcrumbs />
+    </header>
+
+    <!-- Content -->
+    <section class="p-6">
+      <router-outlet />
+    </section>
+  </main>
+</div>

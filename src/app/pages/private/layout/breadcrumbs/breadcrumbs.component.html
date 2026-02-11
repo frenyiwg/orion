@@ -1,0 +1,10 @@
+<nav class="text-sm text-body flex items-center gap-2">
+  <a routerLink="/app" class="text-body-quiet hover:underline">Inicio</a>
+
+  @for (c of breadcrumbs(); track c.url) {
+    <span class="text-body-quiet">/</span>
+    <a [routerLink]="c.url" class="text-body-loud font-semibold hover:underline">
+      {{ c.label }}
+    </a>
+  }
+</nav>

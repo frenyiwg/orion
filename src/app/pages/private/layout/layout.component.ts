@@ -1,12 +1,12 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 import { AuthService } from '@core/services';
+import { BreadcrumbsComponent } from './breadcrumbs/breadcrumbs.component';
+import { SidebarComponent } from './sidebar/sidebar.component';
 
 @Component({
   selector: 'page-layout',
-  template: '<p>Welcome, {{ user?.name }}!</p>',
+  templateUrl: './layout.component.html',
+  imports: [RouterOutlet, BreadcrumbsComponent, SidebarComponent],
 })
-export class LayoutComponent {
-  private authService = inject(AuthService);
-
-  user = this.authService.user;
-}
+export class LayoutComponent {}
