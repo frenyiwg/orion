@@ -1,0 +1,25 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "admin@oriontek.com",
+      "password": "Admin123!",
+      "name": "Administrador General",
+      "role": "ADMIN"
+    },
+    {
+      "id": 2,
+      "username": "user@oriontek.com",
+      "password": "User123!",
+      "name": "Usuario Básico",
+      "role": "USER"
+    },
+    {
+      "id": 3,
+      "username": "support@oriontek.com",
+      "password": "Support123!",
+      "name": "Soporte Técnico",
+      "role": "SUPPORT"
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+<div class="w-full max-w-140 mx-auto">
+  <form class="flex flex-col w-full" (submit)="onSubmit($event)" novalidate>
+    <div class="flex flex-col gap-8">
+      <div>
+        <h1 class="text-center text-2xl text-body-loud font-bold text-blue-950">Iniciar sesión</h1>
+        <p class="text-center leading-3xl font-normal text-body text-gray-600">
+          <span>Introduzca sus credenciales para acceder al portal.</span>
+        </p>
+      </div>
+
+      @if (loginError()) {
+        <p class="text-sm text-red-400 mt-1">{{ loginError() }}</p>
+      }
+
+      <div class="flex flex-col gap-1">
+        <label
+          class="font-semibold text-body-loud leading-2xl text-sm leading-3xl text-gray-500"
+          for="username"
+        >
+          Usuario <span class="text-sm text-red-400">*</span>
+        </label>
+        <input
+          class="border-gray-400 border-neutral leading-3xl text-body-loud bg-neutral-object-accent-silent placeholder:text-body-quiet focus-visible:outline-none focus-visible:outline-2 focus-visible:border-contextual-action focus-visible:caret-color-contextual-action disabled:bg-neutral-object-accent-silent disabled:text-on-disabled disabled:cursor-not-allowed px-3 py-2 h-11 text-base leading-3xl border rounded-lg not-disabled:hover:border-neutral-loud focus-visible:hover:border-contextual-action w-full"
+          autocomplete="off"
+          placeholder="ejemplo@ejemplo.com"
+          [formField]="loginForm.email"
+        />
+        @if (loginForm.email().invalid() && loginForm.email().touched()) {
+          <p class="text-sm text-red-400 mt-1">
+            @for (error of loginForm.email().errors(); track $index) {
+              <span>{{ error.message }}</span>
+            }
+          </p>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label
+          class="font-semibold text-body-loud text-sm leading-2xl text-gray-500"
+          for="password"
+        >
+          Contraseña <span class="text-sm text-red-400">*</span>
+        </label>
+
+        <input
+          class="border-gray-400 border-neutral leading-3xl text-body-loud bg-neutral-object-accent-silent placeholder:text-body-quiet focus-visible:outline-none focus-visible:outline-2 focus-visible:border-contextual-action focus-visible:caret-color-contextual-action disabled:bg-neutral-object-accent-silent disabled:text-on-disabled disabled:cursor-not-allowed px-3 py-2 h-11 text-base leading-3xl border rounded-lg not-disabled:hover:border-neutral-loud focus-visible:hover:border-contextual-action w-full pr-10"
+          autocomplete="off"
+          placeholder="Introduzca su contraseña"
+          type="password"
+          [formField]="loginForm.password"
+        />
+        @if (loginForm.password().invalid() && loginForm.password().touched()) {
+          <p class="text-sm text-red-400 mt-1">
+            @for (error of loginForm.password().errors(); track $index) {
+              <span>{{ error.message }}</span>
+            }
+          </p>
+        }
+      </div>
+
+      <button
+        class="flex justify-center font-semibold whitespace-nowrap gap-3 px-3 py-1.5 border rounded-full w-full disabled:bg-gray-300 disabled:text-white disabled:cursor-not-allowed bg-[rgb(116,96,169)] text-white hover:bg-blue-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-contextual-action"
+        type="submit"
+        [disabled]="loginForm().invalid() || isLoading()"
+        aria-label="Iniciar sesión"
+      >
+        Iniciar sesión
+        @if (isLoading()) {
+          <span
+            class="inline-block h-6 w-6 rounded-full border-2 border-[rgb(181,167,248)] border-t-[rgb(31,3,155)] animate-spin"
+          ></span>
+        }
+      </button>
+    </div>
+  </form>
+</div>

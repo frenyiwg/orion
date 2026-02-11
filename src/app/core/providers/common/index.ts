@@ -5,7 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { AuthService } from '@core/services';
 import { TokenManager } from '@core/utils';
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export function provideAuthInitializer() {
   return makeEnvironmentProviders([

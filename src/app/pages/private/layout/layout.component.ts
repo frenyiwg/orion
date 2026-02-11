@@ -1,7 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+import { AuthService } from '@core/services';
 
 @Component({
   selector: 'page-layout',
-  template: '<p>Welcome, John Doe!</p>',
+  template: '<p>Welcome, {{ user?.name }}!</p>',
 })
-export class LayoutComponent {}
+export class LayoutComponent {
+  private authService = inject(AuthService);
+
+  user = this.authService.user;
+}

@@ -4,6 +4,13 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () => import('./layout/layout.component').then((m) => m.LayoutComponent),
-    children: [],
+    children: [
+      { redirectTo: 'login', path: '', pathMatch: 'full' },
+      {
+        path: 'login',
+        loadComponent: () => import('./login/login.component').then((m) => m.LoginComponent),
+      },
+      { redirectTo: 'login', path: '**' },
+    ],
   },
 ];
