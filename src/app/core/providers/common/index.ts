@@ -1,5 +1,7 @@
 import { inject, makeEnvironmentProviders, provideAppInitializer } from '@angular/core';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+
 import { AuthService } from '@core/services';
 import { TokenManager } from '@core/utils';
 
@@ -22,7 +24,7 @@ export function provideAuthInitializer() {
       }
 
       try {
-        await authService.me();
+        await firstValueFrom(authService.me());
       } catch (e) {
         tokenManager.removeToken?.();
         router.navigate(['/auth/login']);
