@@ -1,0 +1,11 @@
+import { CanMatchFn, Router } from '@angular/router';
+import { inject } from '@angular/core';
+import { AuthService } from '@core/services';
+export const guestGuard: CanMatchFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  if (!auth.isAuthenticated()) return true;
+
+  return router.createUrlTree(['/app']);
+};

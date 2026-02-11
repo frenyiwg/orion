@@ -1,9 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'pages-root',
-  template: `<p>Hola Mundo {{ title() }}</p>`,
+  template: '<router-outlet></router-outlet>',
+  imports: [RouterOutlet],
 })
-export class AppPages {
-  protected readonly title = signal('orion');
-}
+export class AppPages {}

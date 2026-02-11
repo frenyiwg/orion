@@ -7,7 +7,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
   </head>
-  <body>
-    <app-root></app-root>
+  <body root>
+    <div class="app-loader">
+      <div
+        class="w-full h-dvh flex flex-col gap-4 justify-center items-center bg-[rgb(144,123,240)]"
+      >
+        <img src="assets/images/logos/oriontek-white.avif" alt="Logo orion tek" />
+        <div
+          class="h-8 w-8 rounded-full border-2 border-[rgb(181,167,248)] border-t-[rgb(31,3,155)] animate-spin"
+        ></div>
+      </div>
+    </div>
   </body>
 </html>
