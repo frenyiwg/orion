@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd, RouterLink } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
@@ -13,11 +13,18 @@ export class BreadcrumbsComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  private _tick = 0;
+  private tick = signal(0);
+
+  constructor() {
+    this.router.events
+      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+      .subscribe(() => {
+        this.tick.update((v) => v + 1);
+      });
+  }
 
   breadcrumbs = computed<Crumb[]>(() => {
-    // lee tick para recomputar
-    void this._tick;
+    this.tick();
 
     const crumbs: Crumb[] = [];
     let current = this.route.root;

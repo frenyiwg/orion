@@ -7,14 +7,16 @@
     <a
       routerLink="/app"
       routerLinkActive="bg-white/10"
+      [routerLinkActiveOptions]="{ exact: true }"
       class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition"
     >
       <span class="text-sm font-semibold">Home</span>
     </a>
 
     <a
-      routerLink="/app/employees"
+      routerLink="/app/employee"
       routerLinkActive="bg-white/10"
+      [routerLinkActiveOptions]="{ exact: true }"
       class="mt-1 flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition"
     >
       <span class="text-sm font-semibold">Empleados</span>
