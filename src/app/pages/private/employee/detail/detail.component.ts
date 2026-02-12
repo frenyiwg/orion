@@ -2,10 +2,10 @@ import { AsyncPipe, DecimalPipe, NgClass } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { EmployeeService } from '@core/services';
-import { delay, distinctUntilChanged, finalize, map, switchMap } from 'rxjs';
+import { distinctUntilChanged, finalize, map, switchMap } from 'rxjs';
 
 @Component({
-  selector: 'employee-detail',
+  selector: 'app-employee-detail',
   templateUrl: 'detail.component.html',
   imports: [AsyncPipe, DecimalPipe, RouterLink, NgClass],
 })

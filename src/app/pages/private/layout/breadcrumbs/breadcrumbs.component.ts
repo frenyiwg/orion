@@ -2,7 +2,10 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd, RouterLink } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
-type Crumb = { label: string; url: string };
+interface Crumb {
+  label: string;
+  url: string;
+}
 
 @Component({
   selector: 'app-breadcrumbs',

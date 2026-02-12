@@ -11,7 +11,7 @@ interface LoginData {
 }
 
 @Component({
-  selector: 'login',
+  selector: 'app-login',
   templateUrl: 'login.component.html',
   imports: [CommonModule, FormField],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,22 +27,25 @@ export class LoginComponent {
     password: '',
   });
 
-  loginForm = form(this.loginModel, (path) => {
-    (required(path.email, { message: 'El correo electrónico es obligatorio' }),
+  loginForm = form(
+    this.loginModel,
+    (path) => (
+      required(path.email, { message: 'El correo electrónico es obligatorio' }),
       pattern(path.email, EMAIL_REGEX, { message: 'El correo electrónico no es válido' }),
-      required(path.password, { message: 'La contraseña es obligatoria' }));
-  });
+      required(path.password, { message: 'La contraseña es obligatoria' })
+    ),
+  );
 
   async onSubmit(event: Event) {
     event.preventDefault();
     this.isLoading.set(true);
 
-    const { email, password } = this.loginModel();
+    const { email } = this.loginModel();
 
     await delay(2000);
 
     this.authService
-      .login(email, password)
+      .login(email)
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: (user) => {

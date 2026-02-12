@@ -18,7 +18,7 @@ export function minArrayLength(min: number) {
 export function requireOnePrimary() {
   return (control: AbstractControl): ValidationErrors | null => {
     const arr = control as FormArray;
-    const values = (arr?.value ?? []) as Array<{ isPrimary?: boolean }>;
+    const values = (arr?.value ?? []) as { isPrimary?: boolean }[];
     const count = values.filter((v) => !!v?.isPrimary).length;
     return count === 1 ? null : { requireOnePrimary: { expected: 1, actual: count } };
   };
@@ -154,4 +154,5 @@ export type EmployeeEditForm = FormGroup<{
   addresses: FormArray<AddressForm>;
 }>;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ControlMap = Record<string, AbstractControl<any, any>>;

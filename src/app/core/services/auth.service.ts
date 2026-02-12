@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { TokenManager } from '../utils/manager/token-manager';
 import { HttpClient } from '@angular/common/http';
 import { map, tap } from 'rxjs';
@@ -18,7 +18,7 @@ export class AuthService {
     return !!TokenManager.prototype.getToken();
   }
 
-  login(username: string, password: string) {
+  login(username: string) {
     return this.http
       .get<IData<IUser[]>>('/datasource/users/users.json')
       .pipe(

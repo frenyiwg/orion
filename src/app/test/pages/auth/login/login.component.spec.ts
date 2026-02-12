@@ -32,6 +32,7 @@ describe('LoginComponent', () => {
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
 
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     vi.spyOn(TokenManager.prototype, 'setToken').mockImplementation(() => {});
 
     reloadSpy = vi.fn();
@@ -140,7 +141,7 @@ describe('LoginComponent', () => {
     await vi.advanceTimersByTimeAsync(2000);
     await promise;
 
-    expect(authServiceMock.login).toHaveBeenCalledWith('test@test.com', '123456');
+    expect(authServiceMock.login).toHaveBeenCalledWith('test@test.com');
   });
 
   it('should show loader spinner while loading', async () => {

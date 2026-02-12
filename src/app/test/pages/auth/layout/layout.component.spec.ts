@@ -6,8 +6,8 @@ import { LayoutComponent } from '@pages/auth/layout/layout.component';
 
 @Component({
   standalone: true,
-  selector: 'test-host',
-  template: `<page-layout />`,
+  selector: 'app-test-host',
+  template: `<app-page-layout />`,
   imports: [LayoutComponent],
 })
 class HostComponent {}

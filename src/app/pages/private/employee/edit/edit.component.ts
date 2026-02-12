@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AsyncPipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -40,7 +41,7 @@ import {
 } from '../common';
 
 @Component({
-  selector: 'employee-edit',
+  selector: 'app-employee-edit',
   templateUrl: 'edit.component.html',
   imports: [AsyncPipe, ReactiveFormsModule],
 })
@@ -476,6 +477,7 @@ export class EmployeeEditComponent {
   // usado por tu HTML para togglear días
   toggleDay(current: WeekDay[], day: WeekDay): WeekDay[] {
     const set = new Set(current);
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     set.has(day) ? set.delete(day) : set.add(day);
     return Array.from(set) as WeekDay[];
   }

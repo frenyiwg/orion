@@ -25,9 +25,10 @@ export function provideAuthInitializer() {
 
       try {
         await firstValueFrom(authService.me());
-      } catch (e) {
+      } catch (error) {
         tokenManager.removeToken?.();
         router.navigate(['/auth/login']);
+        console.log(error);
       }
     }),
   ]);

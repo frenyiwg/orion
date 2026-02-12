@@ -2,7 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { AuthService } from '@core/services/auth.service';
 
 @Component({
-  selector: 'home',
+  selector: 'app-home',
   templateUrl: 'home.component.html',
 })
 export class HomeComponent {

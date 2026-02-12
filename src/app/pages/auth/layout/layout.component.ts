@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
-  selector: 'page-layout',
+  selector: 'app-page-layout',
   templateUrl: './layout.component.html',
   imports: [RouterOutlet],
 })

@@ -10,9 +10,10 @@ export abstract class ListManager<T> implements OnInit {
   protected defaultLimit: number = DEFAULT_PAGINATION_LIMIT;
   protected initialPage: number = INITIAL_PAGINATION_PAGE;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params: Record<string, any> = {};
   data = signal<T[]>([]);
-  total: number = 0;
+  total = 0;
 
   isLoading = new BehaviorSubject<boolean>(true);
 
@@ -21,6 +22,7 @@ export abstract class ListManager<T> implements OnInit {
     else this.isLoading.next(false);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onFilter(value: Record<string, any>) {
     this.params = {
       numeroPagina: this.initialPage,
@@ -38,7 +40,8 @@ export abstract class ListManager<T> implements OnInit {
     this.getData();
   }
 
-  protected abstract search(params: Record<string, any>): Observable<IData<T>>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  protected abstract search(params: Record<string, any>): Observable<IData<T[]>>;
 
   private getData() {
     this.data.set([]);
