@@ -1,4 +1,3 @@
-import { AsyncPipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -11,9 +10,9 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { catchError, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
+import { catchError, of, tap } from 'rxjs';
 import { EmployeeService } from '@core/services';
-import { Employee, WeekDay } from '@core/interfaces';
+import { WeekDay } from '@core/interfaces';
 import { ToastrService } from 'ngx-toastr';
 import {
   AddressForm,
@@ -40,11 +39,11 @@ import {
 } from '../common';
 
 @Component({
-  selector: 'employee-edit',
-  templateUrl: 'edit.component.html',
-  imports: [AsyncPipe, ReactiveFormsModule],
+  selector: 'employee-create',
+  templateUrl: 'create.component.html',
+  imports: [ReactiveFormsModule],
 })
-export class EmployeeEditComponent {
+export class EmployeeCreateComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly fb = inject(NonNullableFormBuilder);
@@ -72,8 +71,6 @@ export class EmployeeEditComponent {
   shiftOptions = ['DAY', 'NIGHT', 'MIXED'] as const;
   weekDayOptions = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'] as const;
   bankAccountTypeOptions = ['SAVINGS', 'CHECKING', 'OTHER'] as const;
-
-  employeeId = signal('');
 
   // ✅ Typed Form (esto arregla el error del template)
   form: EmployeeEditForm = this.fb.group({
@@ -336,128 +333,24 @@ export class EmployeeEditComponent {
     this.bankAccounts.markAsTouched();
   }
 
-  /** -------- Load employee by id -------- */
-  employee$ = this.route.paramMap.pipe(
-    map((p) => p.get('id') ?? ''),
-    distinctUntilChanged(),
-    tap((id) => {
-      this.employeeId.set(id);
-      this.loading.set(true);
-      this.notFound.set(false);
-    }),
-    switchMap((id) =>
-      id ? this.employeeService.getEmployeeById(id).pipe(catchError(() => of(null))) : of(null),
-    ),
-    tap((e) => {
-      this.loading.set(false);
-      if (!e) {
-        this.notFound.set(true);
-        return;
-      }
-      this.patchFromEmployee(e);
-    }),
-  );
-
-  private patchFromEmployee(e: Employee) {
-    this.emails.clear();
-    this.phones.clear();
-    this.addresses.clear();
-    this.bankAccounts.clear();
-
-    this.form.patchValue({
-      employeeCode: e.employeeCode,
-      status: e.status,
-      personal: {
-        firstName: e.personal.firstName,
-        lastName: e.personal.lastName,
-        preferredName: e.personal.preferredName ?? null,
-        gender: e.personal.gender,
-        maritalStatus: e.personal.maritalStatus,
-        birthDate: e.personal.birthDate,
-        nationality: e.personal.nationality,
-        identification: {
-          type: e.personal.identification.type,
-          number: e.personal.identification.number,
-          issuedCountry: e.personal.identification.issuedCountry,
-          expiresAt: e.personal.identification.expiresAt,
-        },
-      },
-      contact: {
-        preferredLanguage: e.contact.preferredLanguage ?? null,
-        timeZone: e.contact.timeZone ?? null,
-      },
-      employment: {
-        company: e.employment.company,
-        department: e.employment.department,
-        team: e.employment.team ?? null,
-        position: e.employment.position,
-        employmentType: e.employment.employmentType,
-        workMode: e.employment.workMode,
-        hireDate: e.employment.hireDate,
-        terminationDate: e.employment.terminationDate ?? null,
-        location: {
-          name: e.employment.location.name,
-          country: e.employment.location.country,
-        },
-        schedule: {
-          weeklyHours: e.employment.schedule.weeklyHours,
-          shift: e.employment.schedule.shift,
-          workDays: e.employment.schedule.workDays,
-        },
-      },
-      compensation: {
-        currency: e.compensation.currency,
-        baseSalary: e.compensation.baseSalary,
-        payFrequency: e.compensation.payFrequency,
-        bonusEligible: e.compensation.bonusEligible,
-        bonusTargetPercent: e.compensation.bonusTargetPercent ?? null,
-      },
-    });
-
-    for (const m of e.contact.emails ?? []) this.emails.push(this.emailGroup(m));
-    if (!this.emails.length) this.addEmail();
-    const primaryEmailIndex = this.emails.controls.findIndex((g) => g.controls.isPrimary.value);
-    this.setPrimary(this.emails, primaryEmailIndex >= 0 ? primaryEmailIndex : 0);
-
-    for (const p of e.contact.phones ?? []) this.phones.push(this.phoneGroup(p));
-    if (!this.phones.length) this.addPhone();
-    const primaryPhoneIndex = this.phones.controls.findIndex((g) => g.controls.isPrimary.value);
-    this.setPrimary(this.phones, primaryPhoneIndex >= 0 ? primaryPhoneIndex : 0);
-
-    for (const a of e.addresses ?? []) this.addresses.push(this.addressGroup(a));
-    if (!this.addresses.length) this.addAddress();
-    const primaryAddrIndex = this.addresses.controls.findIndex((g) => g.controls.isPrimary.value);
-    this.setPrimary(this.addresses, primaryAddrIndex >= 0 ? primaryAddrIndex : 0);
-
-    for (const b of e.compensation.bankAccounts ?? [])
-      this.bankAccounts.push(this.bankAccountGroup(b));
-
-    this.form.markAsPristine();
-    this.form.markAsUntouched();
-  }
-
   submit() {
     if (this.form.invalid) {
       this.markAllTouched();
       return;
     }
 
-    const id = this.employeeId();
-    if (!id) return;
-
     this.form.disable();
 
     this.saving.set(true);
     const payload = this.form.getRawValue();
 
-    // TODO: update cuando lo tengas en el service
     this.employeeService
-      .updateEmployee(id, payload as any)
+      .createEmployee(payload as any)
       .pipe(
         tap(() => {
-          this.toastr.success('Empleado actualizado correctamente', 'Success');
+          this.toastr.success('Empleado creado correctamente', 'Success');
           this.saving.set(false);
-          this.router.navigate(['../../detalle', id], { relativeTo: this.route });
+          this.router.navigate(['../lista'], { relativeTo: this.route });
         }),
         catchError(() => {
           this.saving.set(false);
@@ -468,9 +361,7 @@ export class EmployeeEditComponent {
   }
 
   cancel() {
-    const id = this.employeeId();
-    if (id) this.router.navigate(['../detalle', id], { relativeTo: this.route });
-    else this.router.navigate(['../'], { relativeTo: this.route });
+    return this.router.navigate(['../'], { relativeTo: this.route });
   }
 
   // usado por tu HTML para togglear días

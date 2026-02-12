@@ -22,4 +22,8 @@ export class EmployeeService {
       .get<IData<Employee[]>>(`datasource/employees/employees.json`)
       .pipe(map((res) => res.data.find((emp: Employee) => emp.id === id)));
   }
+
+  createEmployee(payload: Partial<Employee>) {
+    return this.http.get<boolean>(`datasource/employees/employees.json`).pipe(map(() => true));
+  }
 }

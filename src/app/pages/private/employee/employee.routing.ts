@@ -12,13 +12,19 @@ export const routes: Routes = [
     path: 'detalle/:id',
     loadComponent: () => import('./detail/detail.component').then((m) => m.EmployeeDetailComponent),
     data: { breadcrumb: 'Detalle' },
-    title: 'Employee | Orion',
+    title: 'Employee - Detalle | Orion',
   },
   {
     path: 'editar/:id',
     loadComponent: () => import('./edit/edit.component').then((m) => m.EmployeeEditComponent),
     data: { breadcrumb: 'Editar' },
-    title: 'Employee | Orion',
+    title: 'Employee - Editar | Orion',
+  },
+  {
+    path: 'registrar',
+    loadComponent: () => import('./create/create.component').then((m) => m.EmployeeCreateComponent),
+    data: { breadcrumb: 'Registrar' },
+    title: 'Employee - Registrar | Orion',
   },
   { redirectTo: 'lista', path: '**' },
 ];
