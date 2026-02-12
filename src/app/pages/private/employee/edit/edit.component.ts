@@ -1,0 +1,596 @@
+import { AsyncPipe } from '@angular/common';
+import { Component, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
+import {
+  AbstractControl,
+  FormArray,
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
+import { catchError, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
+import { EmployeeService } from '@core/services';
+import { Employee, WeekDay } from '@core/interfaces';
+
+/** ---------------- Validators ---------------- */
+function minArrayLength(min: number) {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const arr = control as FormArray;
+    return (arr?.length ?? 0) >= min ? null : { minArrayLength: { min, actual: arr?.length ?? 0 } };
+  };
+}
+
+function requireOnePrimary() {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const arr = control as FormArray;
+    const values = (arr?.value ?? []) as Array<{ isPrimary?: boolean }>;
+    const count = values.filter((v) => !!v?.isPrimary).length;
+    return count === 1 ? null : { requireOnePrimary: { expected: 1, actual: count } };
+  };
+}
+
+function iso2or3Validator() {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const v = (control.value ?? '').toString().trim();
+    if (!v) return null;
+    return /^[A-Za-z]{2,3}$/.test(v) ? null : { isoCountry: true };
+  };
+}
+
+/** ---------------- Typed Form Models ---------------- */
+type EmployeeStatus = 'ACTIVE' | 'INACTIVE' | 'ON_LEAVE' | 'TERMINATED';
+type Gender = 'MALE' | 'FEMALE' | 'OTHER' | 'NOT_SPECIFIED';
+type MaritalStatus = 'SINGLE' | 'MARRIED' | 'DIVORCED' | 'WIDOWED' | 'SEPARATED' | 'NOT_SPECIFIED';
+type IdentificationType = 'CEDULA' | 'PASSPORT' | 'RESIDENCY_CARD' | 'DRIVER_LICENSE' | 'OTHER';
+type EmailType = 'WORK' | 'PERSONAL' | 'OTHER';
+type PhoneType = 'MOBILE' | 'HOME' | 'WORK' | 'OTHER';
+type AddressType = 'HOME' | 'WORK' | 'SHIPPING' | 'TEMPORARY' | 'OTHER';
+type EmploymentType = 'FULL_TIME' | 'PART_TIME' | 'CONTRACTOR' | 'INTERN' | 'TEMP';
+type WorkMode = 'ONSITE' | 'REMOTE' | 'HYBRID';
+type Shift = 'DAY' | 'NIGHT' | 'MIXED';
+type BankAccountType = 'SAVINGS' | 'CHECKING' | 'OTHER';
+type PayFrequency = 'WEEKLY' | 'BIWEEKLY' | 'MONTHLY' | 'YEARLY';
+
+type EmailForm = FormGroup<{
+  type: FormControl<EmailType>;
+  value: FormControl<string>;
+  isPrimary: FormControl<boolean>;
+}>;
+
+type PhoneForm = FormGroup<{
+  type: FormControl<PhoneType>;
+  countryCode: FormControl<string>;
+  number: FormControl<string>;
+  ext: FormControl<string | null>;
+  isPrimary: FormControl<boolean>;
+}>;
+
+type AddressForm = FormGroup<{
+  id: FormControl<string>;
+  type: FormControl<AddressType>;
+  label: FormControl<string | null>;
+  isPrimary: FormControl<boolean>;
+  line1: FormControl<string>;
+  line2: FormControl<string | null>;
+  city: FormControl<string>;
+  state: FormControl<string | null>;
+  postalCode: FormControl<string | null>;
+  country: FormControl<string>;
+}>;
+
+type BankAccountForm = FormGroup<{
+  id: FormControl<string>;
+  bankName: FormControl<string>;
+  accountType: FormControl<BankAccountType>;
+  accountNumberMasked: FormControl<string>;
+  isPrimary: FormControl<boolean>;
+}>;
+
+type EmployeeEditForm = FormGroup<{
+  employeeCode: FormControl<string>;
+  status: FormControl<EmployeeStatus>;
+
+  personal: FormGroup<{
+    firstName: FormControl<string>;
+    lastName: FormControl<string>;
+    preferredName: FormControl<string | null>;
+    gender: FormControl<Gender>;
+    maritalStatus: FormControl<MaritalStatus>;
+    birthDate: FormControl<string>;
+    nationality: FormControl<string>;
+
+    identification: FormGroup<{
+      type: FormControl<IdentificationType>;
+      number: FormControl<string>;
+      issuedCountry: FormControl<string>;
+      expiresAt: FormControl<string | null>;
+    }>;
+  }>;
+
+  contact: FormGroup<{
+    preferredLanguage: FormControl<string | null>;
+    timeZone: FormControl<string | null>;
+    emails: FormArray<EmailForm>;
+    phones: FormArray<PhoneForm>;
+  }>;
+
+  employment: FormGroup<{
+    company: FormControl<string>;
+    department: FormControl<string>;
+    team: FormControl<string | null>;
+    position: FormControl<string>;
+    employmentType: FormControl<EmploymentType>;
+    workMode: FormControl<WorkMode>;
+    hireDate: FormControl<string>;
+    terminationDate: FormControl<string | null>;
+
+    location: FormGroup<{
+      name: FormControl<string>;
+      country: FormControl<string>;
+    }>;
+
+    schedule: FormGroup<{
+      weeklyHours: FormControl<number>;
+      shift: FormControl<Shift>;
+      workDays: FormControl<WeekDay[]>;
+    }>;
+  }>;
+
+  compensation: FormGroup<{
+    currency: FormControl<string>;
+    baseSalary: FormControl<number>;
+    payFrequency: FormControl<PayFrequency>;
+    bonusEligible: FormControl<boolean>;
+    bonusTargetPercent: FormControl<number | null>;
+    bankAccounts: FormArray<BankAccountForm>;
+  }>;
+
+  addresses: FormArray<AddressForm>;
+}>;
+
+type ControlMap = Record<string, AbstractControl<any, any>>;
+
+@Component({
+  selector: 'employee-edit',
+  templateUrl: 'edit.component.html',
+  standalone: true,
+  imports: [AsyncPipe, ReactiveFormsModule],
+})
+export class EmployeeEditComponent {
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly fb = inject(NonNullableFormBuilder);
+  private readonly employeeService = inject(EmployeeService);
+
+  loading = signal(true);
+  saving = signal(false);
+  notFound = signal(false);
+
+  // Options usadas en el HTML
+  statusOptions = ['ACTIVE', 'INACTIVE', 'ON_LEAVE', 'TERMINATED'] as const;
+  genderOptions = ['MALE', 'FEMALE', 'OTHER', 'NOT_SPECIFIED'] as const;
+  maritalOptions = [
+    'SINGLE',
+    'MARRIED',
+    'DIVORCED',
+    'WIDOWED',
+    'SEPARATED',
+    'NOT_SPECIFIED',
+  ] as const;
+  idTypeOptions = ['CEDULA', 'PASSPORT', 'RESIDENCY_CARD', 'DRIVER_LICENSE', 'OTHER'] as const;
+  employmentTypeOptions = ['FULL_TIME', 'PART_TIME', 'CONTRACTOR', 'INTERN', 'TEMP'] as const;
+  workModeOptions = ['ONSITE', 'REMOTE', 'HYBRID'] as const;
+  shiftOptions = ['DAY', 'NIGHT', 'MIXED'] as const;
+  weekDayOptions = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'] as const;
+  bankAccountTypeOptions = ['SAVINGS', 'CHECKING', 'OTHER'] as const;
+
+  employeeId = signal('');
+
+  // ✅ Typed Form (esto arregla el error del template)
+  form: EmployeeEditForm = this.fb.group({
+    employeeCode: this.fb.control('', [Validators.required, Validators.maxLength(30)]),
+    status: this.fb.control<EmployeeStatus>('ACTIVE', [Validators.required]),
+
+    personal: this.fb.group({
+      firstName: this.fb.control('', [Validators.required, Validators.maxLength(60)]),
+      lastName: this.fb.control('', [Validators.required, Validators.maxLength(60)]),
+      preferredName: this.fb.control<string | null>(null),
+
+      gender: this.fb.control<Gender>('NOT_SPECIFIED', [Validators.required]),
+      maritalStatus: this.fb.control<MaritalStatus>('NOT_SPECIFIED', [Validators.required]),
+
+      birthDate: this.fb.control('', [Validators.required]),
+      nationality: this.fb.control('', [Validators.required, iso2or3Validator()]),
+
+      identification: this.fb.group({
+        type: this.fb.control<IdentificationType>('CEDULA', [Validators.required]),
+        number: this.fb.control('', [Validators.required, Validators.maxLength(50)]),
+        issuedCountry: this.fb.control('', [Validators.required, iso2or3Validator()]),
+        expiresAt: this.fb.control<string | null>(null),
+      }),
+    }),
+
+    contact: this.fb.group({
+      preferredLanguage: this.fb.control<string | null>(null),
+      timeZone: this.fb.control<string | null>(null),
+
+      emails: this.fb.array<EmailForm>([], [minArrayLength(1), requireOnePrimary()]),
+      phones: this.fb.array<PhoneForm>([], [minArrayLength(1), requireOnePrimary()]),
+    }),
+
+    employment: this.fb.group({
+      company: this.fb.control('', [Validators.required]),
+      department: this.fb.control('', [Validators.required]),
+      team: this.fb.control<string | null>(null),
+      position: this.fb.control('', [Validators.required]),
+
+      employmentType: this.fb.control<EmploymentType>('FULL_TIME', [Validators.required]),
+      workMode: this.fb.control<WorkMode>('ONSITE', [Validators.required]),
+      hireDate: this.fb.control('', [Validators.required]),
+      terminationDate: this.fb.control<string | null>(null),
+
+      location: this.fb.group({
+        name: this.fb.control('', [Validators.required]),
+        country: this.fb.control('', [Validators.required, iso2or3Validator()]),
+      }),
+
+      schedule: this.fb.group({
+        weeklyHours: this.fb.control(40, [
+          Validators.required,
+          Validators.min(1),
+          Validators.max(80),
+        ]),
+        shift: this.fb.control<Shift>('DAY', [Validators.required]),
+        workDays: this.fb.control<WeekDay[]>(
+          ['MON', 'TUE', 'WED', 'THU', 'FRI'],
+          [Validators.required],
+        ),
+      }),
+    }),
+
+    compensation: this.fb.group({
+      currency: this.fb.control('DOP', [Validators.required, Validators.maxLength(3)]),
+      baseSalary: this.fb.control(0, [Validators.required, Validators.min(0)]),
+      payFrequency: this.fb.control<PayFrequency>('MONTHLY', [Validators.required]),
+      bonusEligible: this.fb.control(false),
+      bonusTargetPercent: this.fb.control<number | null>(null),
+
+      bankAccounts: this.fb.array<BankAccountForm>([]),
+    }),
+
+    addresses: this.fb.array<AddressForm>([], [minArrayLength(1), requireOnePrimary()]),
+  }) as unknown as EmployeeEditForm;
+
+  // Getters usados por tu HTML (tal cual)
+  get contactGroup() {
+    return this.form.controls.contact;
+  }
+  get emails() {
+    return this.contactGroup.controls.emails;
+  }
+  get phones() {
+    return this.contactGroup.controls.phones;
+  }
+  get addresses() {
+    return this.form.controls.addresses;
+  }
+  get bankAccounts() {
+    return this.form.controls.compensation.controls.bankAccounts;
+  }
+
+  constructor() {
+    // Mantienes checkbox en emails/phones: si marcan varios, dejamos solo 1
+    this.emails.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.normalizePrimary(this.emails));
+    this.phones.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.normalizePrimary(this.phones));
+  }
+
+  /** -------- Row builders (typed) -------- */
+  private emailGroup(v?: any): EmailForm {
+    return this.fb.group({
+      type: this.fb.control<EmailType>(v?.type ?? 'WORK', [Validators.required]),
+      value: this.fb.control<string>(v?.value ?? '', [Validators.required, Validators.email]),
+      isPrimary: this.fb.control<boolean>(!!v?.isPrimary),
+    }) as EmailForm;
+  }
+
+  private phoneGroup(v?: any): PhoneForm {
+    return this.fb.group({
+      type: this.fb.control<PhoneType>(v?.type ?? 'MOBILE', [Validators.required]),
+      countryCode: this.fb.control<string>(v?.countryCode ?? '+1', [
+        Validators.required,
+        Validators.pattern(/^\+\d{1,4}$/),
+      ]),
+      number: this.fb.control<string>(v?.number ?? '', [
+        Validators.required,
+        Validators.pattern(/^[0-9]{7,15}$/),
+      ]),
+      ext: this.fb.control<string | null>(v?.ext ?? null),
+      isPrimary: this.fb.control<boolean>(!!v?.isPrimary),
+    }) as PhoneForm;
+  }
+
+  private addressGroup(v?: any): AddressForm {
+    return this.fb.group({
+      id: this.fb.control<string>(v?.id ?? crypto.randomUUID()),
+      type: this.fb.control<AddressType>(v?.type ?? 'HOME', [Validators.required]),
+      label: this.fb.control<string | null>(v?.label ?? null),
+      isPrimary: this.fb.control<boolean>(!!v?.isPrimary),
+
+      line1: this.fb.control<string>(v?.line1 ?? '', [
+        Validators.required,
+        Validators.maxLength(120),
+      ]),
+      line2: this.fb.control<string | null>(v?.line2 ?? null),
+
+      city: this.fb.control<string>(v?.city ?? '', [Validators.required]),
+      state: this.fb.control<string | null>(v?.state ?? null),
+      postalCode: this.fb.control<string | null>(v?.postalCode ?? null),
+      country: this.fb.control<string>(v?.country ?? '', [Validators.required, iso2or3Validator()]),
+    }) as AddressForm;
+  }
+
+  private bankAccountGroup(v?: any): BankAccountForm {
+    return this.fb.group({
+      id: this.fb.control<string>(v?.id ?? crypto.randomUUID()),
+      bankName: this.fb.control<string>(v?.bankName ?? '', [Validators.required]),
+      accountType: this.fb.control<BankAccountType>(v?.accountType ?? 'SAVINGS', [
+        Validators.required,
+      ]),
+      accountNumberMasked: this.fb.control<string>(v?.accountNumberMasked ?? '', [
+        Validators.required,
+      ]),
+      isPrimary: this.fb.control<boolean>(!!v?.isPrimary),
+    }) as BankAccountForm;
+  }
+
+  /** -------- Primary helpers -------- */
+  private setPrimary<T extends ControlMap & { isPrimary: FormControl<boolean> }>(
+    arr: FormArray<FormGroup<T>>,
+    index: number,
+  ) {
+    arr.controls.forEach((g, i) =>
+      g.controls.isPrimary.setValue(i === index, { emitEvent: false }),
+    );
+    arr.markAsDirty();
+    arr.updateValueAndValidity({ emitEvent: false });
+  }
+
+  // usado por tu HTML (radio primary en direcciones)
+  setPrimaryAddress(index: number) {
+    this.setPrimary(this.addresses, index);
+  }
+
+  private normalizePrimary<T extends ControlMap & { isPrimary: FormControl<boolean> }>(
+    arr: FormArray<FormGroup<T>>,
+  ) {
+    const indexes = arr.controls
+      .map((g, i) => (g.controls.isPrimary.value ? i : -1))
+      .filter((i) => i >= 0);
+
+    if (indexes.length <= 1) {
+      arr.updateValueAndValidity({ emitEvent: false });
+      return;
+    }
+
+    const keep = indexes[indexes.length - 1];
+    this.setPrimary(arr, keep);
+  }
+
+  /** -------- Arrays actions (HTML) -------- */
+  addEmail() {
+    this.emails.push(this.emailGroup({ isPrimary: this.emails.length === 0 }));
+    this.emails.updateValueAndValidity();
+  }
+
+  removeEmail(i: number) {
+    if (this.emails.length <= 1) return;
+    const wasPrimary = this.emails.at(i).controls.isPrimary.value;
+    this.emails.removeAt(i);
+    if (wasPrimary && this.emails.length) this.setPrimary(this.emails, 0);
+    this.emails.updateValueAndValidity();
+  }
+
+  addPhone() {
+    this.phones.push(this.phoneGroup({ isPrimary: this.phones.length === 0 }));
+    this.phones.updateValueAndValidity();
+  }
+
+  removePhone(i: number) {
+    if (this.phones.length <= 1) return;
+    const wasPrimary = this.phones.at(i).controls.isPrimary.value;
+    this.phones.removeAt(i);
+    if (wasPrimary && this.phones.length) this.setPrimary(this.phones, 0);
+    this.phones.updateValueAndValidity();
+  }
+
+  addAddress() {
+    this.addresses.push(this.addressGroup({ isPrimary: this.addresses.length === 0 }));
+    this.addresses.updateValueAndValidity();
+  }
+
+  removeAddress(i: number) {
+    if (this.addresses.length <= 1) return;
+    const wasPrimary = this.addresses.at(i).controls.isPrimary.value;
+    this.addresses.removeAt(i);
+    if (wasPrimary && this.addresses.length) this.setPrimary(this.addresses, 0);
+    this.addresses.updateValueAndValidity();
+  }
+
+  addBank() {
+    this.bankAccounts.push(this.bankAccountGroup());
+    this.bankAccounts.updateValueAndValidity();
+  }
+
+  removeBank(i: number) {
+    this.bankAccounts.removeAt(i);
+    this.bankAccounts.updateValueAndValidity();
+  }
+
+  /** -------- Error helpers (HTML) -------- */
+  hasError(ctrl: AbstractControl | null | undefined, code: string) {
+    return !!ctrl && ctrl.touched && ctrl.hasError(code);
+  }
+
+  arrayError(arr: AbstractControl | null | undefined, code: string) {
+    return !!arr && arr.touched && arr.hasError(code);
+  }
+
+  markAllTouched() {
+    this.form.markAllAsTouched();
+    this.emails.markAsTouched();
+    this.phones.markAsTouched();
+    this.addresses.markAsTouched();
+    this.bankAccounts.markAsTouched();
+  }
+
+  /** -------- Load employee by id -------- */
+  employee$ = this.route.paramMap.pipe(
+    map((p) => p.get('id') ?? ''),
+    distinctUntilChanged(),
+    tap((id) => {
+      this.employeeId.set(id);
+      this.loading.set(true);
+      this.notFound.set(false);
+    }),
+    switchMap((id) =>
+      id ? this.employeeService.getEmployeeById(id).pipe(catchError(() => of(null))) : of(null),
+    ),
+    tap((e) => {
+      this.loading.set(false);
+      if (!e) {
+        this.notFound.set(true);
+        return;
+      }
+      this.patchFromEmployee(e);
+    }),
+  );
+
+  private patchFromEmployee(e: Employee) {
+    this.emails.clear();
+    this.phones.clear();
+    this.addresses.clear();
+    this.bankAccounts.clear();
+
+    this.form.patchValue({
+      employeeCode: e.employeeCode,
+      status: e.status,
+      personal: {
+        firstName: e.personal.firstName,
+        lastName: e.personal.lastName,
+        preferredName: e.personal.preferredName ?? null,
+        gender: e.personal.gender,
+        maritalStatus: e.personal.maritalStatus,
+        birthDate: e.personal.birthDate,
+        nationality: e.personal.nationality,
+        identification: {
+          type: e.personal.identification.type,
+          number: e.personal.identification.number,
+          issuedCountry: e.personal.identification.issuedCountry,
+          expiresAt: e.personal.identification.expiresAt,
+        },
+      },
+      contact: {
+        preferredLanguage: e.contact.preferredLanguage ?? null,
+        timeZone: e.contact.timeZone ?? null,
+      },
+      employment: {
+        company: e.employment.company,
+        department: e.employment.department,
+        team: e.employment.team ?? null,
+        position: e.employment.position,
+        employmentType: e.employment.employmentType,
+        workMode: e.employment.workMode,
+        hireDate: e.employment.hireDate,
+        terminationDate: e.employment.terminationDate ?? null,
+        location: {
+          name: e.employment.location.name,
+          country: e.employment.location.country,
+        },
+        schedule: {
+          weeklyHours: e.employment.schedule.weeklyHours,
+          shift: e.employment.schedule.shift,
+          workDays: e.employment.schedule.workDays,
+        },
+      },
+      compensation: {
+        currency: e.compensation.currency,
+        baseSalary: e.compensation.baseSalary,
+        payFrequency: e.compensation.payFrequency,
+        bonusEligible: e.compensation.bonusEligible,
+        bonusTargetPercent: e.compensation.bonusTargetPercent ?? null,
+      },
+    });
+
+    for (const m of e.contact.emails ?? []) this.emails.push(this.emailGroup(m));
+    if (!this.emails.length) this.addEmail();
+    const primaryEmailIndex = this.emails.controls.findIndex((g) => g.controls.isPrimary.value);
+    this.setPrimary(this.emails, primaryEmailIndex >= 0 ? primaryEmailIndex : 0);
+
+    for (const p of e.contact.phones ?? []) this.phones.push(this.phoneGroup(p));
+    if (!this.phones.length) this.addPhone();
+    const primaryPhoneIndex = this.phones.controls.findIndex((g) => g.controls.isPrimary.value);
+    this.setPrimary(this.phones, primaryPhoneIndex >= 0 ? primaryPhoneIndex : 0);
+
+    for (const a of e.addresses ?? []) this.addresses.push(this.addressGroup(a));
+    if (!this.addresses.length) this.addAddress();
+    const primaryAddrIndex = this.addresses.controls.findIndex((g) => g.controls.isPrimary.value);
+    this.setPrimary(this.addresses, primaryAddrIndex >= 0 ? primaryAddrIndex : 0);
+
+    for (const b of e.compensation.bankAccounts ?? [])
+      this.bankAccounts.push(this.bankAccountGroup(b));
+
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
+  }
+
+  submit() {
+    if (this.form.invalid) {
+      this.markAllTouched();
+      return;
+    }
+
+    const id = this.employeeId();
+    if (!id) return;
+
+    this.form.disable();
+
+    this.saving.set(true);
+    const payload = this.form.getRawValue();
+
+    // TODO: update cuando lo tengas en el service
+    this.employeeService
+      .updateEmployee(id, payload as any)
+      .pipe(
+        tap(() => {
+          this.saving.set(false);
+          this.router.navigate(['../../detalle', id], { relativeTo: this.route });
+        }),
+        catchError(() => {
+          this.saving.set(false);
+          return of(null);
+        }),
+      )
+      .subscribe();
+  }
+
+  cancel() {
+    const id = this.employeeId();
+    if (id) this.router.navigate(['../detalle', id], { relativeTo: this.route });
+    else this.router.navigate(['../'], { relativeTo: this.route });
+  }
+
+  // usado por tu HTML para togglear días
+  toggleDay(current: WeekDay[], day: WeekDay): WeekDay[] {
+    const set = new Set(current);
+    set.has(day) ? set.delete(day) : set.add(day);
+    return Array.from(set) as WeekDay[];
+  }
+}

@@ -1,1 +1,58 @@
-<p>Welcome to the employee page!</p>
+<div data-testid="home-page" className="flex flex-col gap-8 @container">
+  <div className="grid grid-cols-1 @4xl:grid-cols-[1fr_320px] gap-6 laptop:gap-3 items-start">
+    <div className="flex flex-col gap-6 self-start">
+      <div data-testid="greeting-section">
+        <h2 class="text-2xl text-body-loud font-bold text-gray-950">Empleados</h2>
+        <p data-testid="greeting-description" className="text-body font-normal text-gray-500">
+          Lista de empleados de tu institución.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="h-full min-h-125 relative mt-8">
+  <div
+    class="h-full flex flex-col bg-neutral-object border-neutral border-[0.5px] rounded-xl shadow-neutral-md overflow-hidden"
+  >
+    <div
+      class="px-3 py-3 w-full flex gap-2 tablet:flex-wrap tablet:gap-0 tablet:items-center justify-between"
+    >
+      <div class="flex items-center gap-2">
+        <h6 class="text-h6 text-heading" data-testid="table-title">
+          Cantidad de empleados ({{ total }})
+        </h6>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="hidden md:inline">
+          <div class="relative">
+            <input
+              data-slot="input"
+              class="border-neutral leading-3xl text-body-loud bg-neutral-object-accent-silent placeholder:text-body-quiet focus-visible:outline-none focus-visible:outline-2 focus-visible:border-contextual-action focus-visible:caret-color-contextual-action disabled:bg-neutral-object-accent-silent disabled:text-on-disabled disabled:cursor-not-allowed py-1 pr-1 h-8 leading-2xl border rounded-lg not-disabled:hover:border-neutral-loud focus-visible:hover:border-contextual-action pl-8.5 w-60 text-sm"
+              placeholder="Buscar rol..."
+              data-testid="search-input"
+              value=""
+            />
+          </div>
+        </div>
+
+        <button
+          data-slot="button"
+          class="font-semibold leading-3xl inline-flex items-center justify-center whitespace-nowrap transition-all disabled:pointer-events-none gap-2 px-2 py-1 text-sm h-8 border rounded-lg relative"
+          data-testid="filter-button"
+          type="button"
+        >
+          <span class="hidden md:inline-block">Filtros</span>
+        </button>
+        <button
+          data-slot="button"
+          class="font-semibold leading-3xl inline-flex items-center justify-center whitespace-nowrap transition-all disabled:pointer-events-none [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*='size-'])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive cursor-pointer shadow-neutral-xs border-surface-action-solid bg-surface-action-solid text-on-solid hover:border-surface-action-solid-hover hover:bg-surface-action-solid-hover focus:bg-surface-action-solid-click disabled:bg-neutral-object-accent disabled:text-on-disabled disabled:border-transparent gap-2 px-2 py-1 text-sm h-8 border rounded-lg"
+        >
+          <span class="hidden md:inline-block">Registrar Empleado</span>
+        </button>
+      </div>
+    </div>
+
+    <employee-list [employees]="data()" />
+  </div>
+</div>

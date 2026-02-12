@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Employee, IData } from '@core/interfaces';
-import { map } from 'rxjs';
+import { delay, map } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class EmployeeService {
@@ -14,6 +14,12 @@ export class EmployeeService {
   getEmployeeById(id: string) {
     return this.http
       .get<IData<Employee[]>>('datasource/employees/employees.json')
+      .pipe(map((res) => res.data.find((emp: Employee) => emp.id === id)));
+  }
+
+  updateEmployee(id: string, payload: Partial<Employee>) {
+    return this.http
+      .get<IData<Employee[]>>(`datasource/employees/employees.json`)
       .pipe(map((res) => res.data.find((emp: Employee) => emp.id === id)));
   }
 }

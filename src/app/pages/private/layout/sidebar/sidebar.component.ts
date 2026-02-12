@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, output, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '@core/services';
 
@@ -9,6 +9,12 @@ import { AuthService } from '@core/services';
 })
 export class SidebarComponent {
   private authService = inject(AuthService);
+
+  navigate = output<void>();
+
+  onNavigate() {
+    this.navigate.emit();
+  }
 
   user = computed(() => this.authService.user);
   isUserMenuOpen = signal(false);

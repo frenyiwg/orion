@@ -1,0 +1,1086 @@
+<section class="w-full">
+  <!-- dispara la carga -->
+  @if (employee$ | async; as _e) {}
+
+  @if (loading()) {
+    <div class="rounded-2xl border border-neutral-200 bg-white p-6">
+      <div class="flex items-center gap-3">
+        <span
+          class="inline-block h-5 w-5 rounded-full border-2 border-neutral-200 border-t-neutral-700 animate-spin"
+        ></span>
+        <p class="text-sm text-neutral-600">Cargando empleado...</p>
+      </div>
+    </div>
+  } @else {
+    @if (notFound()) {
+      <div class="rounded-2xl border border-neutral-200 bg-white p-6">
+        <p class="text-sm text-neutral-600">Empleado no encontrado.</p>
+        <button
+          class="mt-4 rounded-lg border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50"
+          (click)="cancel()"
+        >
+          Volver
+        </button>
+      </div>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
+        <!-- Header -->
+        <div class="rounded-2xl border border-neutral-200 bg-white p-4 sm:p-6">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div class="min-w-0">
+              <h1 class="text-lg sm:text-xl font-semibold text-neutral-900">Editar empleado</h1>
+              <p class="text-sm text-neutral-600 truncate">
+                {{ form.controls.personal.controls.firstName.value }}
+                {{ form.controls.personal.controls.lastName.value }} ·
+                {{ form.controls.employeeCode.value }}
+              </p>
+            </div>
+
+            <div class="flex flex-wrap gap-2 sm:justify-end">
+              <button
+                type="button"
+                class="rounded-lg border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50"
+                (click)="cancel()"
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="submit"
+                class="rounded-lg bg-neutral-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-60"
+                [disabled]="saving() || form.pristine || form.invalid"
+              >
+                @if (saving()) {
+                  Guardando...
+                } @else {
+                  Guardar cambios
+                }
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <!-- Left -->
+          <div class="lg:col-span-1 space-y-4">
+            <!-- Básico -->
+            <div class="rounded-2xl border border-neutral-200 bg-white p-4 sm:p-6">
+              <h2 class="text-sm font-semibold text-neutral-900">Básico</h2>
+
+              <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
+                <label class="text-sm">
+                  <span class="text-neutral-600"
+                    >Código <span class="text-sm text-red-400">*</span></span
+                  >
+                  <input
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="employeeCode"
+                  />
+
+                  @if (hasError(form.controls.employeeCode, 'required')) {
+                    <p class="mt-1 text-xs text-rose-600">El código es requerido.</p>
+                  }
+                  @if (hasError(form.controls.employeeCode, 'maxlength')) {
+                    <p class="mt-1 text-xs text-rose-600">Máximo 30 caracteres.</p>
+                  }
+                </label>
+
+                <label class="text-sm">
+                  <span class="text-neutral-600"
+                    >Estatus <span class="text-sm text-red-400">*</span></span
+                  >
+                  <select
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="status"
+                  >
+                    @for (s of statusOptions; track s) {
+                      <option [value]="s">{{ s }}</option>
+                    }
+                  </select>
+
+                  @if (hasError(form.controls.status, 'required')) {
+                    <p class="mt-1 text-xs text-rose-600">El estatus es requerido.</p>
+                  }
+                </label>
+              </div>
+            </div>
+
+            <!-- Personal -->
+            <div
+              class="rounded-2xl border border-neutral-200 bg-white p-4 sm:p-6"
+              formGroupName="personal"
+            >
+              <h2 class="text-sm font-semibold text-neutral-900">Personal</h2>
+
+              <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label class="text-sm">
+                  <span class="text-neutral-600"
+                    >Nombre <span class="text-sm text-red-400">*</span></span
+                  >
+                  <input
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="firstName"
+                  />
+
+                  @if (hasError(form.controls.personal.controls.firstName, 'required')) {
+                    <p class="mt-1 text-xs text-rose-600">El nombre es requerido.</p>
+                  }
+                  @if (hasError(form.controls.personal.controls.firstName, 'maxlength')) {
+                    <p class="mt-1 text-xs text-rose-600">Máximo 60 caracteres.</p>
+                  }
+                </label>
+
+                <label class="text-sm">
+                  <span class="text-neutral-600"
+                    >Apellido <span class="text-sm text-red-400">*</span></span
+                  >
+                  <input
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="lastName"
+                  />
+
+                  @if (hasError(form.controls.personal.controls.lastName, 'required')) {
+                    <p class="mt-1 text-xs text-rose-600">El apellido es requerido.</p>
+                  }
+                  @if (hasError(form.controls.personal.controls.lastName, 'maxlength')) {
+                    <p class="mt-1 text-xs text-rose-600">Máximo 60 caracteres.</p>
+                  }
+                </label>
+
+                <label class="text-sm">
+                  <span class="text-neutral-600">Nombre preferido</span>
+                  <input
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="preferredName"
+                  />
+                </label>
+
+                <label class="text-sm">
+                  <span class="text-neutral-600"
+                    >Nacimiento <span class="text-sm text-red-400">*</span></span
+                  >
+                  <input
+                    type="date"
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="birthDate"
+                  />
+
+                  @if (hasError(form.controls.personal.controls.birthDate, 'required')) {
+                    <p class="mt-1 text-xs text-rose-600">La fecha de nacimiento es requerida.</p>
+                  }
+                </label>
+
+                <label class="text-sm">
+                  <span class="text-neutral-600"
+                    >Género <span class="text-sm text-red-400">*</span></span
+                  >
+                  <select
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="gender"
+                  >
+                    @for (g of genderOptions; track g) {
+                      <option [value]="g">{{ g }}</option>
+                    }
+                  </select>
+
+                  @if (hasError(form.controls.personal.controls.gender, 'required')) {
+                    <p class="mt-1 text-xs text-rose-600">El género es requerido.</p>
+                  }
+                </label>
+
+                <label class="text-sm">
+                  <span class="text-neutral-600"
+                    >Estado civil <span class="text-sm text-red-400">*</span></span
+                  >
+                  <select
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="maritalStatus"
+                  >
+                    @for (m of maritalOptions; track m) {
+                      <option [value]="m">{{ m }}</option>
+                    }
+                  </select>
+
+                  @if (hasError(form.controls.personal.controls.maritalStatus, 'required')) {
+                    <p class="mt-1 text-xs text-rose-600">El estado civil es requerido.</p>
+                  }
+                </label>
+
+                <label class="text-sm">
+                  <span class="text-neutral-600"
+                    >Nacionalidad (ISO) <span class="text-sm text-red-400">*</span></span
+                  >
+                  <input
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="nationality"
+                  />
+
+                  @if (hasError(form.controls.personal.controls.nationality, 'required')) {
+                    <p class="mt-1 text-xs text-rose-600">La nacionalidad es requerida.</p>
+                  }
+                  @if (hasError(form.controls.personal.controls.nationality, 'isoCountry')) {
+                    <p class="mt-1 text-xs text-rose-600">
+                      Debe ser ISO 2 o 3 letras (ej: DO / DOM).
+                    </p>
+                  }
+                </label>
+              </div>
+
+              <!-- Identificación -->
+              <div
+                class="mt-4 rounded-xl border border-neutral-200 p-4"
+                formGroupName="identification"
+              >
+                <p class="text-sm font-medium text-neutral-900">Identificación</p>
+
+                <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <label class="text-sm">
+                    <span class="text-neutral-600"
+                      >Tipo <span class="text-sm text-red-400">*</span></span
+                    >
+                    <select
+                      class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                      formControlName="type"
+                    >
+                      @for (t of idTypeOptions; track t) {
+                        <option [value]="t">{{ t }}</option>
+                      }
+                    </select>
+
+                    @if (
+                      hasError(
+                        form.controls.personal.controls.identification.controls.type,
+                        'required'
+                      )
+                    ) {
+                      <p class="mt-1 text-xs text-rose-600">El tipo es requerido.</p>
+                    }
+                  </label>
+
+                  <label class="text-sm">
+                    <span class="text-neutral-600"
+                      >Número <span class="text-sm text-red-400">*</span></span
+                    >
+                    <input
+                      class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                      formControlName="number"
+                    />
+
+                    @if (
+                      hasError(
+                        form.controls.personal.controls.identification.controls.number,
+                        'required'
+                      )
+                    ) {
+                      <p class="mt-1 text-xs text-rose-600">El número es requerido.</p>
+                    }
+                    @if (
+                      hasError(
+                        form.controls.personal.controls.identification.controls.number,
+                        'maxlength'
+                      )
+                    ) {
+                      <p class="mt-1 text-xs text-rose-600">Máximo 50 caracteres.</p>
+                    }
+                  </label>
+
+                  <label class="text-sm">
+                    <span class="text-neutral-600"
+                      >País emisión <span class="text-sm text-red-400">*</span></span
+                    >
+                    <input
+                      class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                      formControlName="issuedCountry"
+                    />
+
+                    @if (
+                      hasError(
+                        form.controls.personal.controls.identification.controls.issuedCountry,
+                        'required'
+                      )
+                    ) {
+                      <p class="mt-1 text-xs text-rose-600">El país de emisión es requerido.</p>
+                    }
+                    @if (
+                      hasError(
+                        form.controls.personal.controls.identification.controls.issuedCountry,
+                        'isoCountry'
+                      )
+                    ) {
+                      <p class="mt-1 text-xs text-rose-600">Debe ser ISO 2 o 3 letras (ej: DO).</p>
+                    }
+                  </label>
+
+                  <label class="text-sm">
+                    <span class="text-neutral-600">Expira</span>
+                    <input
+                      type="date"
+                      class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                      formControlName="expiresAt"
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right -->
+          <div class="lg:col-span-2 space-y-4">
+            <!-- Contacto -->
+            <div
+              class="rounded-2xl border border-neutral-200 bg-white p-4 sm:p-6"
+              formGroupName="contact"
+            >
+              <div class="flex items-center justify-between gap-3">
+                <h2 class="text-sm font-semibold text-neutral-900">Contacto</h2>
+              </div>
+
+              <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label class="text-sm">
+                  <span class="text-neutral-600">Idioma preferido</span>
+                  <input
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="preferredLanguage"
+                  />
+                </label>
+
+                <label class="text-sm">
+                  <span class="text-neutral-600">Zona horaria</span>
+                  <input
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="timeZone"
+                  />
+                </label>
+              </div>
+
+              <!-- Emails -->
+              <div class="mt-4 rounded-xl border border-neutral-200 overflow-hidden">
+                <div
+                  class="flex items-center justify-between px-4 py-3 bg-neutral-50 border-b border-neutral-200"
+                >
+                  <p class="text-sm font-medium text-neutral-900">Emails</p>
+                  <button
+                    type="button"
+                    class="text-sm rounded-lg border border-neutral-200 px-3 py-1.5 hover:bg-white"
+                    (click)="addEmail()"
+                  >
+                    Agregar
+                  </button>
+                </div>
+
+                <div class="p-4 space-y-3" formArrayName="emails">
+                  @if (arrayError(emails, 'minArrayLength')) {
+                    <p class="text-xs text-rose-600">Debe existir al menos 1 email.</p>
+                  }
+                  @if (arrayError(emails, 'requireOnePrimary')) {
+                    <p class="text-xs text-rose-600">
+                      Debes marcar exactamente 1 email como Primary.
+                    </p>
+                  }
+
+                  @for (g of emails.controls; track $index; let i = $index) {
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3" [formGroupName]="i">
+                      <div class="sm:col-span-3">
+                        <select
+                          class="w-full rounded-lg border border-neutral-200 px-3 py-2"
+                          formControlName="type"
+                        >
+                          <option value="WORK">WORK</option>
+                          <option value="PERSONAL">PERSONAL</option>
+                          <option value="OTHER">OTHER</option>
+                        </select>
+
+                        @if (hasError(emails.at(i).controls.type, 'required')) {
+                          <p class="mt-1 text-xs text-rose-600">Tipo requerido.</p>
+                        }
+                      </div>
+
+                      <div class="sm:col-span-6">
+                        <input
+                          class="w-full rounded-lg border border-neutral-200 px-3 py-2"
+                          placeholder="email@dominio.com"
+                          formControlName="value"
+                        />
+
+                        @if (hasError(emails.at(i).controls.value, 'required')) {
+                          <p class="mt-1 text-xs text-rose-600">El email es requerido.</p>
+                        }
+                        @if (hasError(emails.at(i).controls.value, 'email')) {
+                          <p class="mt-1 text-xs text-rose-600">Formato de email inválido.</p>
+                        }
+                      </div>
+
+                      <div class="sm:col-span-2 flex items-center gap-2">
+                        <!-- Mantengo checkbox (validador exige 1 primary) -->
+                        <input type="checkbox" class="h-4 w-4" formControlName="isPrimary" />
+                        <span class="text-sm text-neutral-600">Primary</span>
+                      </div>
+
+                      <div class="sm:col-span-1 flex sm:justify-end">
+                        <button
+                          type="button"
+                          class="rounded-lg border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50"
+                          (click)="removeEmail(i)"
+                          [disabled]="emails.length === 1"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Phones -->
+              <div class="mt-4 rounded-xl border border-neutral-200 overflow-hidden">
+                <div
+                  class="flex items-center justify-between px-4 py-3 bg-neutral-50 border-b border-neutral-200"
+                >
+                  <p class="text-sm font-medium text-neutral-900">Teléfonos</p>
+                  <button
+                    type="button"
+                    class="text-sm rounded-lg border border-neutral-200 px-3 py-1.5 hover:bg-white"
+                    (click)="addPhone()"
+                  >
+                    Agregar
+                  </button>
+                </div>
+
+                <div class="p-4 space-y-3" formArrayName="phones">
+                  @if (arrayError(phones, 'minArrayLength')) {
+                    <p class="text-xs text-rose-600">Debe existir al menos 1 teléfono.</p>
+                  }
+                  @if (arrayError(phones, 'requireOnePrimary')) {
+                    <p class="text-xs text-rose-600">
+                      Debes marcar exactamente 1 teléfono como Primary.
+                    </p>
+                  }
+
+                  @for (g of phones.controls; track $index; let i = $index) {
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3" [formGroupName]="i">
+                      <div class="sm:col-span-3">
+                        <select
+                          class="w-full rounded-lg border border-neutral-200 px-3 py-2"
+                          formControlName="type"
+                        >
+                          <option value="MOBILE">MOBILE</option>
+                          <option value="HOME">HOME</option>
+                          <option value="WORK">WORK</option>
+                          <option value="OTHER">OTHER</option>
+                        </select>
+
+                        @if (hasError(phones.at(i).controls.type, 'required')) {
+                          <p class="mt-1 text-xs text-rose-600">Tipo requerido.</p>
+                        }
+                      </div>
+
+                      <div class="sm:col-span-2">
+                        <input
+                          class="w-full rounded-lg border border-neutral-200 px-3 py-2"
+                          placeholder="+1"
+                          formControlName="countryCode"
+                        />
+
+                        @if (hasError(phones.at(i).controls.countryCode, 'required')) {
+                          <p class="mt-1 text-xs text-rose-600">El código es requerido.</p>
+                        }
+                        @if (hasError(phones.at(i).controls.countryCode, 'pattern')) {
+                          <p class="mt-1 text-xs text-rose-600">Formato inválido (ej: +1 / +57).</p>
+                        }
+                      </div>
+
+                      <div class="sm:col-span-4">
+                        <input
+                          class="w-full rounded-lg border border-neutral-200 px-3 py-2"
+                          placeholder="8090000000"
+                          formControlName="number"
+                        />
+
+                        @if (hasError(phones.at(i).controls.number, 'required')) {
+                          <p class="mt-1 text-xs text-rose-600">El número es requerido.</p>
+                        }
+                        @if (hasError(phones.at(i).controls.number, 'pattern')) {
+                          <p class="mt-1 text-xs text-rose-600">Debe tener 7 a 15 dígitos.</p>
+                        }
+                      </div>
+
+                      <div class="sm:col-span-1">
+                        <input
+                          class="w-full rounded-lg border border-neutral-200 px-3 py-2"
+                          placeholder="ext"
+                          formControlName="ext"
+                        />
+                      </div>
+
+                      <div class="sm:col-span-1 flex items-center gap-2">
+                        <input type="checkbox" class="h-4 w-4" formControlName="isPrimary" />
+                        <span class="text-sm text-neutral-600">P</span>
+                      </div>
+
+                      <div class="sm:col-span-1 flex sm:justify-end">
+                        <button
+                          type="button"
+                          class="rounded-lg border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50"
+                          (click)="removePhone(i)"
+                          [disabled]="phones.length === 1"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- Laboral -->
+            <div
+              class="rounded-2xl border border-neutral-200 bg-white p-4 sm:p-6"
+              formGroupName="employment"
+            >
+              <h2 class="text-sm font-semibold text-neutral-900">Laboral</h2>
+
+              <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label class="text-sm">
+                  <span class="text-neutral-600">Empresa</span>
+                  <input
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="company"
+                  />
+
+                  @if (hasError(form.controls.employment.controls.company, 'required')) {
+                    <p class="mt-1 text-xs text-rose-600">La empresa es requerida.</p>
+                  }
+                </label>
+
+                <label class="text-sm">
+                  <span class="text-neutral-600">Posición</span>
+                  <input
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="position"
+                  />
+
+                  @if (hasError(form.controls.employment.controls.position, 'required')) {
+                    <p class="mt-1 text-xs text-rose-600">La posición es requerida.</p>
+                  }
+                </label>
+
+                <label class="text-sm">
+                  <span class="text-neutral-600">Departamento</span>
+                  <input
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="department"
+                  />
+
+                  @if (hasError(form.controls.employment.controls.department, 'required')) {
+                    <p class="mt-1 text-xs text-rose-600">El departamento es requerido.</p>
+                  }
+                </label>
+
+                <label class="text-sm">
+                  <span class="text-neutral-600">Team</span>
+                  <input
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="team"
+                  />
+                </label>
+
+                <label class="text-sm">
+                  <span class="text-neutral-600">Tipo de empleo</span>
+                  <select
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="employmentType"
+                  >
+                    @for (t of employmentTypeOptions; track t) {
+                      <option [value]="t">{{ t }}</option>
+                    }
+                  </select>
+
+                  @if (hasError(form.controls.employment.controls.employmentType, 'required')) {
+                    <p class="mt-1 text-xs text-rose-600">Requerido.</p>
+                  }
+                </label>
+
+                <label class="text-sm">
+                  <span class="text-neutral-600">Modalidad</span>
+                  <select
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="workMode"
+                  >
+                    @for (m of workModeOptions; track m) {
+                      <option [value]="m">{{ m }}</option>
+                    }
+                  </select>
+
+                  @if (hasError(form.controls.employment.controls.workMode, 'required')) {
+                    <p class="mt-1 text-xs text-rose-600">Requerido.</p>
+                  }
+                </label>
+
+                <label class="text-sm">
+                  <span class="text-neutral-600">Hire date</span>
+                  <input
+                    type="date"
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="hireDate"
+                  />
+
+                  @if (hasError(form.controls.employment.controls.hireDate, 'required')) {
+                    <p class="mt-1 text-xs text-rose-600">La fecha de ingreso es requerida.</p>
+                  }
+                </label>
+
+                <label class="text-sm">
+                  <span class="text-neutral-600">Termination date</span>
+                  <input
+                    type="date"
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="terminationDate"
+                  />
+                </label>
+              </div>
+
+              <div class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div class="rounded-xl border border-neutral-200 p-4" formGroupName="location">
+                  <p class="text-sm font-medium text-neutral-900">Ubicación</p>
+                  <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label class="text-sm">
+                      <span class="text-neutral-600">Nombre</span>
+                      <input
+                        class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                        formControlName="name"
+                      />
+
+                      @if (
+                        hasError(
+                          form.controls.employment.controls.location.controls.name,
+                          'required'
+                        )
+                      ) {
+                        <p class="mt-1 text-xs text-rose-600">
+                          El nombre de ubicación es requerido.
+                        </p>
+                      }
+                    </label>
+
+                    <label class="text-sm">
+                      <span class="text-neutral-600">País</span>
+                      <input
+                        class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                        formControlName="country"
+                      />
+
+                      @if (
+                        hasError(
+                          form.controls.employment.controls.location.controls.country,
+                          'required'
+                        )
+                      ) {
+                        <p class="mt-1 text-xs text-rose-600">El país es requerido.</p>
+                      }
+                      @if (
+                        hasError(
+                          form.controls.employment.controls.location.controls.country,
+                          'isoCountry'
+                        )
+                      ) {
+                        <p class="mt-1 text-xs text-rose-600">ISO 2 o 3 letras (ej: DO).</p>
+                      }
+                    </label>
+                  </div>
+                </div>
+
+                <div class="rounded-xl border border-neutral-200 p-4" formGroupName="schedule">
+                  <p class="text-sm font-medium text-neutral-900">Horario</p>
+                  <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label class="text-sm">
+                      <span class="text-neutral-600">Horas/semana</span>
+                      <input
+                        type="number"
+                        class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                        formControlName="weeklyHours"
+                      />
+
+                      @if (
+                        hasError(
+                          form.controls.employment.controls.schedule.controls.weeklyHours,
+                          'required'
+                        )
+                      ) {
+                        <p class="mt-1 text-xs text-rose-600">Requerido.</p>
+                      }
+                      @if (
+                        hasError(
+                          form.controls.employment.controls.schedule.controls.weeklyHours,
+                          'min'
+                        )
+                      ) {
+                        <p class="mt-1 text-xs text-rose-600">Mínimo 1 hora.</p>
+                      }
+                      @if (
+                        hasError(
+                          form.controls.employment.controls.schedule.controls.weeklyHours,
+                          'max'
+                        )
+                      ) {
+                        <p class="mt-1 text-xs text-rose-600">Máximo 80 horas.</p>
+                      }
+                    </label>
+
+                    <label class="text-sm">
+                      <span class="text-neutral-600">Shift</span>
+                      <select
+                        class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                        formControlName="shift"
+                      >
+                        @for (s of shiftOptions; track s) {
+                          <option [value]="s">{{ s }}</option>
+                        }
+                      </select>
+
+                      @if (
+                        hasError(
+                          form.controls.employment.controls.schedule.controls.shift,
+                          'required'
+                        )
+                      ) {
+                        <p class="mt-1 text-xs text-rose-600">Requerido.</p>
+                      }
+                    </label>
+                  </div>
+
+                  <div class="mt-3">
+                    <p class="text-xs font-medium text-neutral-500">Días</p>
+                    <div class="mt-2 flex flex-wrap gap-2">
+                      @for (d of weekDayOptions; track d) {
+                        <button
+                          type="button"
+                          class="text-xs rounded-full px-2 py-1 border border-neutral-200"
+                          [class.bg-neutral-900]="
+                            form.controls.employment.controls.schedule.controls.workDays.value.includes(
+                              d
+                            )
+                          "
+                          [class.text-white]="
+                            form.controls.employment.controls.schedule.controls.workDays.value.includes(
+                              d
+                            )
+                          "
+                          (click)="
+                            form.controls.employment.controls.schedule.controls.workDays.setValue(
+                              toggleDay(
+                                form.controls.employment.controls.schedule.controls.workDays.value,
+                                d
+                              )
+                            )
+                          "
+                        >
+                          {{ d }}
+                        </button>
+                      }
+                    </div>
+
+                    @if (
+                      hasError(
+                        form.controls.employment.controls.schedule.controls.workDays,
+                        'required'
+                      )
+                    ) {
+                      <p class="mt-2 text-xs text-rose-600">Debes seleccionar al menos un día.</p>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Compensación -->
+            <div
+              class="rounded-2xl border border-neutral-200 bg-white p-4 sm:p-6"
+              formGroupName="compensation"
+            >
+              <h2 class="text-sm font-semibold text-neutral-900">Compensación</h2>
+
+              <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label class="text-sm">
+                  <span class="text-neutral-600">Moneda</span>
+                  <input
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="currency"
+                  />
+
+                  @if (hasError(form.controls.compensation.controls.currency, 'required')) {
+                    <p class="mt-1 text-xs text-rose-600">La moneda es requerida.</p>
+                  }
+                  @if (hasError(form.controls.compensation.controls.currency, 'maxlength')) {
+                    <p class="mt-1 text-xs text-rose-600">Máximo 3 caracteres (ISO-4217).</p>
+                  }
+                </label>
+
+                <label class="text-sm">
+                  <span class="text-neutral-600">Salario base</span>
+                  <input
+                    type="number"
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="baseSalary"
+                  />
+
+                  @if (hasError(form.controls.compensation.controls.baseSalary, 'required')) {
+                    <p class="mt-1 text-xs text-rose-600">El salario es requerido.</p>
+                  }
+                  @if (hasError(form.controls.compensation.controls.baseSalary, 'min')) {
+                    <p class="mt-1 text-xs text-rose-600">No puede ser negativo.</p>
+                  }
+                </label>
+
+                <label class="text-sm">
+                  <span class="text-neutral-600">Frecuencia</span>
+                  <select
+                    class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                    formControlName="payFrequency"
+                  >
+                    <option value="WEEKLY">WEEKLY</option>
+                    <option value="BIWEEKLY">BIWEEKLY</option>
+                    <option value="MONTHLY">MONTHLY</option>
+                    <option value="YEARLY">YEARLY</option>
+                  </select>
+
+                  @if (hasError(form.controls.compensation.controls.payFrequency, 'required')) {
+                    <p class="mt-1 text-xs text-rose-600">Requerido.</p>
+                  }
+                </label>
+
+                <label class="text-sm flex items-center gap-2 mt-6 sm:mt-0">
+                  <input type="checkbox" class="h-4 w-4" formControlName="bonusEligible" />
+                  <span class="text-neutral-700">Bonus eligible</span>
+                </label>
+
+                @if (form.controls.compensation.controls.bonusEligible.value) {
+                  <label class="text-sm sm:col-span-2">
+                    <span class="text-neutral-600">Bonus %</span>
+                    <input
+                      type="number"
+                      class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                      formControlName="bonusTargetPercent"
+                    />
+                  </label>
+                }
+              </div>
+
+              <!-- Bank accounts -->
+              <div class="mt-4 rounded-xl border border-neutral-200 overflow-hidden">
+                <div
+                  class="flex items-center justify-between px-4 py-3 bg-neutral-50 border-b border-neutral-200"
+                >
+                  <p class="text-sm font-medium text-neutral-900">Cuentas bancarias</p>
+                  <button
+                    type="button"
+                    class="text-sm rounded-lg border border-neutral-200 px-3 py-1.5 hover:bg-white"
+                    (click)="addBank()"
+                  >
+                    Agregar
+                  </button>
+                </div>
+
+                <div class="p-4 space-y-3" formArrayName="bankAccounts">
+                  @if (bankAccounts.controls.length === 0) {
+                    <p class="text-sm text-neutral-500">—</p>
+                  } @else {
+                    @for (g of bankAccounts.controls; track $index; let i = $index) {
+                      <div class="grid grid-cols-1 sm:grid-cols-12 gap-3" [formGroupName]="i">
+                        <div class="sm:col-span-4">
+                          <input
+                            class="w-full rounded-lg border border-neutral-200 px-3 py-2"
+                            placeholder="Banco"
+                            formControlName="bankName"
+                          />
+                        </div>
+                        <div class="sm:col-span-3">
+                          <select
+                            class="w-full rounded-lg border border-neutral-200 px-3 py-2"
+                            formControlName="accountType"
+                          >
+                            @for (t of bankAccountTypeOptions; track t) {
+                              <option [value]="t">{{ t }}</option>
+                            }
+                          </select>
+                        </div>
+                        <div class="sm:col-span-3">
+                          <input
+                            class="w-full rounded-lg border border-neutral-200 px-3 py-2"
+                            placeholder="****4321"
+                            formControlName="accountNumberMasked"
+                          />
+                        </div>
+                        <div class="sm:col-span-1 flex items-center gap-2">
+                          <input type="checkbox" class="h-4 w-4" formControlName="isPrimary" />
+                          <span class="text-sm text-neutral-600">P</span>
+                        </div>
+                        <div class="sm:col-span-1 flex sm:justify-end">
+                          <button
+                            type="button"
+                            class="rounded-lg border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50"
+                            (click)="removeBank(i)"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </div>
+                    }
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- Direcciones -->
+            <div class="rounded-2xl border border-neutral-200 bg-white p-4 sm:p-6">
+              <div class="flex items-center justify-between gap-3">
+                <h2 class="text-sm font-semibold text-neutral-900">Direcciones</h2>
+                <button
+                  type="button"
+                  class="text-sm rounded-lg border border-neutral-200 px-3 py-2 hover:bg-neutral-50"
+                  (click)="addAddress()"
+                >
+                  Agregar dirección
+                </button>
+              </div>
+
+              @if (arrayError(addresses, 'minArrayLength')) {
+                <p class="mt-2 text-xs text-rose-600">Debe existir al menos 1 dirección.</p>
+              }
+              @if (arrayError(addresses, 'requireOnePrimary')) {
+                <p class="mt-1 text-xs text-rose-600">
+                  Debes seleccionar exactamente 1 dirección como Primary.
+                </p>
+              }
+
+              <div
+                class="mt-4 w-full overflow-x-auto rounded-xl border border-neutral-200 bg-white"
+              >
+                <table class="min-w-250 w-full text-sm" formArrayName="addresses">
+                  <thead class="bg-neutral-50 text-neutral-700">
+                    <tr class="border-b border-neutral-200">
+                      <th class="px-4 py-3 text-left font-medium">Tipo</th>
+                      <th class="px-4 py-3 text-left font-medium">Label</th>
+                      <th class="px-4 py-3 text-left font-medium">Line 1</th>
+                      <th class="px-4 py-3 text-left font-medium">Ciudad</th>
+                      <th class="px-4 py-3 text-left font-medium">País</th>
+                      <th class="px-4 py-3 text-left font-medium">Primary</th>
+                      <th class="px-4 py-3 text-right font-medium">Acción</th>
+                    </tr>
+                  </thead>
+
+                  <tbody class="divide-y divide-neutral-200">
+                    @for (g of addresses.controls; track $index; let i = $index) {
+                      <tr class="align-top" [formGroupName]="i">
+                        <td class="px-4 py-3">
+                          <select
+                            class="w-full rounded-lg border border-neutral-200 px-3 py-2"
+                            formControlName="type"
+                          >
+                            <option value="HOME">HOME</option>
+                            <option value="WORK">WORK</option>
+                            <option value="SHIPPING">SHIPPING</option>
+                            <option value="TEMPORARY">TEMPORARY</option>
+                            <option value="OTHER">OTHER</option>
+                          </select>
+
+                          @if (hasError(addresses.at(i).controls.type, 'required')) {
+                            <p class="mt-1 text-xs text-rose-600">Tipo requerido.</p>
+                          }
+                        </td>
+
+                        <td class="px-4 py-3">
+                          <input
+                            class="w-full rounded-lg border border-neutral-200 px-3 py-2"
+                            formControlName="label"
+                            placeholder="Casa / Oficina"
+                          />
+                        </td>
+
+                        <td class="px-4 py-3">
+                          <input
+                            class="w-full rounded-lg border border-neutral-200 px-3 py-2"
+                            formControlName="line1"
+                            placeholder="Calle, número"
+                          />
+                          @if (hasError(addresses.at(i).controls.line1, 'required')) {
+                            <p class="mt-1 text-xs text-rose-600">Line 1 es requerido.</p>
+                          }
+                          @if (hasError(addresses.at(i).controls.line1, 'maxlength')) {
+                            <p class="mt-1 text-xs text-rose-600">Máximo 120 caracteres.</p>
+                          }
+
+                          <input
+                            class="mt-2 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                            formControlName="line2"
+                            placeholder="Apto, piso (opcional)"
+                          />
+                        </td>
+
+                        <td class="px-4 py-3">
+                          <input
+                            class="w-full rounded-lg border border-neutral-200 px-3 py-2"
+                            formControlName="city"
+                            placeholder="Ciudad"
+                          />
+                          @if (hasError(addresses.at(i).controls.city, 'required')) {
+                            <p class="mt-1 text-xs text-rose-600">Ciudad requerida.</p>
+                          }
+
+                          <input
+                            class="mt-2 w-full rounded-lg border border-neutral-200 px-3 py-2"
+                            formControlName="state"
+                            placeholder="Estado (opcional)"
+                          />
+                        </td>
+
+                        <td class="px-4 py-3">
+                          <input
+                            class="w-full rounded-lg border border-neutral-200 px-3 py-2"
+                            formControlName="country"
+                            placeholder="DO"
+                          />
+                          @if (hasError(addresses.at(i).controls.country, 'required')) {
+                            <p class="mt-1 text-xs text-rose-600">País requerido.</p>
+                          }
+                          @if (hasError(addresses.at(i).controls.country, 'isoCountry')) {
+                            <p class="mt-1 text-xs text-rose-600">ISO 2 o 3 letras (ej: DO).</p>
+                          }
+                        </td>
+
+                        <td class="px-4 py-3">
+                          <div class="flex items-center gap-2">
+                            <input
+                              type="radio"
+                              name="primaryAddress"
+                              class="h-4 w-4"
+                              [checked]="addresses.at(i).value.isPrimary"
+                              (change)="setPrimaryAddress(i)"
+                            />
+                            <span class="text-sm text-neutral-600">Primary</span>
+                          </div>
+                        </td>
+
+                        <td class="px-4 py-3 text-right">
+                          <button
+                            type="button"
+                            class="rounded-lg border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50"
+                            (click)="removeAddress(i)"
+                            [disabled]="addresses.length === 1"
+                          >
+                            Eliminar
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    }
+  }
+</section>

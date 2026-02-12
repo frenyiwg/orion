@@ -1,4 +1,4 @@
-import { Directive, OnInit } from '@angular/core';
+import { Directive, OnInit, signal } from '@angular/core';
 import { BehaviorSubject, Observable, EMPTY } from 'rxjs';
 import { catchError, finalize, take, tap } from 'rxjs/operators';
 import { DEFAULT_PAGINATION_LIMIT, INITIAL_PAGINATION_PAGE } from '../const';
@@ -11,7 +11,8 @@ export abstract class ListManager<T> implements OnInit {
   protected initialPage: number = INITIAL_PAGINATION_PAGE;
 
   params: Record<string, any> = {};
-  data: T[] = [];
+  data = signal<T[]>([]);
+  total: number = 0;
 
   isLoading = new BehaviorSubject<boolean>(true);
 
@@ -40,7 +41,7 @@ export abstract class ListManager<T> implements OnInit {
   protected abstract search(params: Record<string, any>): Observable<IData<T>>;
 
   private getData() {
-    this.data = [];
+    this.data.set([]);
 
     this.isLoading.next(true);
 
@@ -48,10 +49,11 @@ export abstract class ListManager<T> implements OnInit {
       .pipe(
         take(1),
         tap((response) => {
-          this.data = (response.data ?? []) as T[];
+          this.data.set((response.data ?? []) as T[]);
+          this.total = this.data().length ?? 0;
         }),
         catchError(() => {
-          this.data = [];
+          this.data.set([]);
           return EMPTY;
         }),
         finalize(() => this.isLoading.next(false)),

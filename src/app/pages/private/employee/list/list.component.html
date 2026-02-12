@@ -1,0 +1,175 @@
+<div
+  class="w-full text-body border-y border-neutral-quiet min-h-0 flex-1 overflow-auto h-full relative"
+>
+  <table class="min-w-275 w-full text-sm">
+    <thead class="bg-neutral-50 text-neutral-700">
+      <tr class="border-b border-neutral-200">
+        <th class="px-4 py-3 text-left font-medium">Empleado</th>
+        <th class="px-4 py-3 text-left font-medium">Estatus</th>
+        <th class="px-4 py-3 text-left font-medium">Puesto</th>
+        <th class="px-4 py-3 text-left font-medium">Departamento</th>
+        <th class="px-4 py-3 text-left font-medium">Work mode</th>
+        <th class="px-4 py-3 text-left font-medium">Email / Tel</th>
+        <th class="px-4 py-3 text-left font-medium">Contratación</th>
+        <th class="px-4 py-3 text-left font-medium">Salario</th>
+        <th class="px-4 py-3 text-right font-medium"></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (e of employees(); track e.id) {
+        <tr>
+          <td class="px-2 py-4 border-b border-neutral-quiet">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-neutral-object">
+                <img
+                  src="/assets/images/profile/user-{{ $index + 1 }}.jpg"
+                  alt="{{ e.personal.firstName }} {{ e.personal.lastName }}"
+                  class="w-full h-full rounded-full object-cover"
+                />
+              </div>
+              <div class="flex flex-col">
+                <span class="text-xl text-gray-950">
+                  {{ e.personal.firstName }} {{ e.personal.lastName }}
+                </span>
+                <span class="text-gray-500">
+                  {{ e.employeeCode }}
+                </span>
+              </div>
+            </div>
+          </td>
+
+          <!-- Estatus -->
+          <td class="px-2 py-4 border-b border-neutral-quiet">
+            <span
+              class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium"
+              [ngClass]="{
+                'bg-emerald-50 text-emerald-700': e.status === 'ACTIVE',
+                'bg-amber-50 text-amber-700': e.status === 'ON_LEAVE',
+                'bg-neutral-100 text-neutral-700': e.status === 'INACTIVE',
+                'bg-rose-50 text-rose-700': e.status === 'TERMINATED',
+              }"
+            >
+              {{ e.status }}
+            </span>
+
+            @if (e.employment.leave) {
+              <div class="text-xs text-neutral-500 mt-1">
+                Leave: {{ e.employment.leave.type }} ({{ e.employment.leave.startDate
+                }}{{ e.employment.leave.endDate ? ' → ' + e.employment.leave.endDate : '' }})
+              </div>
+            }
+          </td>
+
+          <!-- Puesto -->
+          <td class="px-4 py-3 text-neutral-800 border-b border-neutral-quiet">
+            <div class="font-medium">{{ e.employment.position }}</div>
+            <div class="text-xs text-neutral-500">
+              {{ e.employment.employmentType }} · {{ e.employment.schedule.shift }} ·
+              {{ e.employment.schedule.weeklyHours }}h
+            </div>
+          </td>
+
+          <!-- Departamento -->
+          <td class="px-4 py-3 text-neutral-800 border-b border-neutral-quiet">
+            <div>{{ e.employment.department }}</div>
+            @if (e.employment.team) {
+              <div class="text-xs text-neutral-500">Team: {{ e.employment.team }}</div>
+            }
+          </td>
+
+          <!-- Work mode -->
+          <td class="px-4 py-3 text-neutral-800 border-b border-neutral-quiet">
+            <div class="font-medium">{{ e.employment.workMode }}</div>
+            <div class="text-xs text-neutral-500">
+              {{ e.employment.location.name }} ({{ e.employment.location.country }})
+            </div>
+          </td>
+
+          <!-- Email / Tel -->
+          <td class="px-4 py-3 text-neutral-800 border-b border-neutral-quiet">
+            <div class="text-sm">
+              {{ getPrimaryEmail(e) }}
+            </div>
+            <div class="text-xs text-neutral-500">
+              {{ getPrimaryPhone(e) }}
+            </div>
+          </td>
+
+          <!-- Contratación -->
+          <td class="px-4 py-3 text-neutral-800 border-b border-neutral-quiet">
+            <div class="text-sm">Hire: {{ e.employment.hireDate }}</div>
+            @if (e.employment.terminationDate) {
+              <div class="text-sm text-rose-600">Term: {{ e.employment.terminationDate }}</div>
+            }
+          </td>
+
+          <!-- Salario -->
+          <td class="px-4 py-3 text-neutral-800 border-b border-neutral-quiet">
+            <div class="font-medium">
+              {{ e.compensation.currency }} {{ e.compensation.baseSalary | number: '1.0-0' }}
+            </div>
+            <div class="text-xs text-neutral-500">
+              {{ e.compensation.payFrequency }}
+              @if (e.compensation.bonusEligible) {
+                <span> · Bonus {{ e.compensation.bonusTargetPercent ?? 0 }}% </span>
+              }
+            </div>
+          </td>
+
+          <!-- Acción (dropdown) -->
+          <td class="px-4 py-3 text-right border-b border-neutral-quiet">
+            <div class="relative inline-block text-left">
+              <button
+                type="button"
+                class="inline-flex items-center justify-center rounded-lg border border-neutral-200 px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                (click)="toggleRowMenu(e.id)"
+                aria-haspopup="menu"
+                [attr.aria-expanded]="openMenuId === e.id"
+              >
+                Acciones
+                <span class="ml-2 text-neutral-400">▾</span>
+              </button>
+
+              @if (openMenuId === e.id) {
+                <div
+                  class="absolute right-0 mt-2 w-44 origin-top-right rounded-lg border border-neutral-200 bg-white shadow-lg z-50"
+                  role="menu"
+                >
+                  <button
+                    type="button"
+                    class="w-full text-left px-4 py-2 text-sm hover:bg-neutral-50 cursor-pointer"
+                    routerLink="../detalle/{{ e.id }}"
+                    role="menuitem"
+                  >
+                    Ver detalle
+                  </button>
+
+                  <button
+                    type="button"
+                    class="w-full text-left px-4 py-2 text-sm hover:bg-neutral-50 cursor-pointer"
+                    routerLink="../editar/{{ e.id }}"
+                    role="menuitem"
+                  >
+                    Editar
+                  </button>
+
+                  <div class="my-1 border-t border-neutral-200"></div>
+
+                  <button
+                    type="button"
+                    class="w-full text-left px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 cursor-pointer"
+                    (click)="deactivateEmployee(e)"
+                    role="menuitem"
+                    [disabled]="e.status === 'TERMINATED'"
+                  >
+                    Desactivar
+                  </button>
+                </div>
+              }
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
