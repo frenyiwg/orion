@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { form, FormField, pattern, required } from '@angular/forms/signals';
-import { Router } from '@angular/router';
 import { AuthService } from '@core/services';
 import { EMAIL_REGEX, TokenManager } from '@core/utils';
 import { delay, finalize } from 'rxjs';
@@ -19,7 +18,6 @@ interface LoginData {
 })
 export class LoginComponent {
   private readonly authService = inject(AuthService);
-  private readonly router = inject(Router);
 
   isLoading = signal(false);
   loginError = signal<string | null>(null);
