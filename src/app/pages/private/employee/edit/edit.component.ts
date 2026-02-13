@@ -451,9 +451,10 @@ export class EmployeeEditComponent {
     this.saving.set(true);
     const payload = this.form.getRawValue();
 
+    console.log(payload);
     // TODO: update cuando lo tengas en el service
     this.employeeService
-      .updateEmployee(id, payload as any)
+      .updateEmployee(id)
       .pipe(
         tap(() => {
           this.toastr.success('Empleado actualizado correctamente', 'Success');

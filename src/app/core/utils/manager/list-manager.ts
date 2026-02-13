@@ -1,11 +1,14 @@
-import { Directive, OnInit, signal } from '@angular/core';
+import { Directive, inject, OnInit, signal } from '@angular/core';
 import { BehaviorSubject, Observable, EMPTY } from 'rxjs';
 import { catchError, finalize, take, tap } from 'rxjs/operators';
 import { DEFAULT_PAGINATION_LIMIT, INITIAL_PAGINATION_PAGE } from '../const';
 import { IData } from '@core/interfaces';
+import { AuthService } from '@core/services';
 
 @Directive()
 export abstract class ListManager<T> implements OnInit {
+  private readonly authUser = inject(AuthService);
+
   protected enableInitialLoad = false;
   protected defaultLimit: number = DEFAULT_PAGINATION_LIMIT;
   protected initialPage: number = INITIAL_PAGINATION_PAGE;
@@ -62,5 +65,9 @@ export abstract class ListManager<T> implements OnInit {
         finalize(() => this.isLoading.next(false)),
       )
       .subscribe();
+  }
+
+  get isAdmin(): boolean {
+    return this.authUser.user?.role === 'ADMIN';
   }
 }

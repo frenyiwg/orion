@@ -345,8 +345,10 @@ export class EmployeeCreateComponent {
     this.saving.set(true);
     const payload = this.form.getRawValue();
 
+    console.log(payload);
+
     this.employeeService
-      .createEmployee(payload as any)
+      .createEmployee()
       .pipe(
         tap(() => {
           this.toastr.success('Empleado creado correctamente', 'Success');

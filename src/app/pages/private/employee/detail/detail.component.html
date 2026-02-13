@@ -93,12 +93,15 @@
 
           <!-- Actions -->
           <div class="flex flex-wrap gap-2 sm:justify-end">
-            <a
-              class="inline-flex items-center justify-center rounded-lg border border-neutral-200 px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
-              [routerLink]="['../../editar', e.id]"
-            >
-              Editar
-            </a>
+            @if (isAdmin) {
+              <a
+                class="inline-flex items-center justify-center rounded-lg border border-neutral-200 px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                [routerLink]="['../../editar', e.id]"
+              >
+                Editar
+              </a>
+            }
+
             <a
               class="inline-flex items-center justify-center rounded-lg bg-neutral-900 px-3 py-2 text-sm font-medium text-white hover:opacity-90"
               [routerLink]="['../']"

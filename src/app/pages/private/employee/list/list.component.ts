@@ -11,6 +11,7 @@ import { Employee } from '@core/interfaces';
 })
 export class EmployeeListComponent {
   employees = input<Employee[]>([]);
+  isAdmin = input<boolean>(false);
 
   // En tu componente (ejemplo mínimo)
   openMenuId: string | null = null;
