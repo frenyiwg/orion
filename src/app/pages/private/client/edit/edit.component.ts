@@ -12,7 +12,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { catchError, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
+import { catchError, delay, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
 import { ClientService } from '@core/services';
 import { Client, WeekDay } from '@core/interfaces';
 import { ToastrService } from 'ngx-toastr';
@@ -349,6 +349,7 @@ export class ClientEditComponent {
     switchMap((id) =>
       id ? this.clientService.getClientById(id).pipe(catchError(() => of(null))) : of(null),
     ),
+    delay(2000),
     tap((e) => {
       this.loading.set(false);
       if (!e) {
