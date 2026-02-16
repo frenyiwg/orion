@@ -2,7 +2,7 @@ import { AsyncPipe, DecimalPipe, NgClass } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService, ClientService } from '@core/services';
-import { finalize, map, switchMap } from 'rxjs';
+import { delay, finalize, map, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-client-detail',
@@ -14,14 +14,17 @@ export class ClientDetailComponent {
   private readonly service = inject(ClientService);
   private readonly authService = inject(AuthService);
 
-  loading = signal(false);
+  loading = signal(true);
   isAdmin = this.authService.user?.role === 'ADMIN';
 
   client$ = this.route.paramMap.pipe(
     map((p) => p.get('id') ?? ''),
     switchMap((id) => {
       this.loading.set(true);
-      return this.service.getClientById(id).pipe(finalize(() => this.loading.set(false)));
+      return this.service.getClientById(id).pipe(
+        delay(2000),
+        finalize(() => this.loading.set(false)),
+      );
     }),
     finalize(() => this.loading.set(false)),
   );
