@@ -4,7 +4,7 @@
   <table class="min-w-275 w-full text-sm">
     <thead class="bg-neutral-50 text-neutral-700">
       <tr class="border-b border-neutral-200">
-        <th class="px-4 py-3 text-left font-medium">Empleado</th>
+        <th class="px-4 py-3 text-left font-medium">Cliente</th>
         <th class="px-4 py-3 text-left font-medium">Estatus</th>
         <th class="px-4 py-3 text-left font-medium">Puesto</th>
         <th class="px-4 py-3 text-left font-medium">Departamento</th>
@@ -16,7 +16,7 @@
       </tr>
     </thead>
     <tbody>
-      @for (e of employees(); track e.id) {
+      @for (e of clients(); track e.id) {
         <tr>
           <td class="px-2 py-4 border-b border-neutral-quiet">
             <div class="flex items-center gap-3">
@@ -32,7 +32,7 @@
                   {{ e.personal.firstName }} {{ e.personal.lastName }}
                 </span>
                 <span class="text-gray-500">
-                  {{ e.employeeCode }}
+                  {{ e.clientCode }}
                 </span>
               </div>
             </div>
@@ -161,7 +161,7 @@
                     <button
                       type="button"
                       class="w-full text-left px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 cursor-pointer"
-                      (click)="deactivateEmployee(e)"
+                      (click)="deactivateClient(e)"
                       role="menuitem"
                       [disabled]="e.status === 'TERMINATED'"
                     >

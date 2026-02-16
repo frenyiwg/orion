@@ -13,8 +13,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { catchError, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
-import { EmployeeService } from '@core/services';
-import { Employee, WeekDay } from '@core/interfaces';
+import { ClientService } from '@core/services';
+import { Client, WeekDay } from '@core/interfaces';
 import { ToastrService } from 'ngx-toastr';
 import {
   AddressForm,
@@ -24,8 +24,8 @@ import {
   ControlMap,
   EmailForm,
   EmailType,
-  EmployeeEditForm,
-  EmployeeStatus,
+  ClientEditForm,
+  ClientStatus,
   EmploymentType,
   Gender,
   IdentificationType,
@@ -41,15 +41,15 @@ import {
 } from '../common';
 
 @Component({
-  selector: 'app-employee-edit',
+  selector: 'app-client-edit',
   templateUrl: 'edit.component.html',
   imports: [AsyncPipe, ReactiveFormsModule],
 })
-export class EmployeeEditComponent {
+export class ClientEditComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly fb = inject(NonNullableFormBuilder);
-  private readonly employeeService = inject(EmployeeService);
+  private readonly clientService = inject(ClientService);
   private readonly toastr = inject(ToastrService);
 
   loading = signal(true);
@@ -74,12 +74,12 @@ export class EmployeeEditComponent {
   weekDayOptions = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'] as const;
   bankAccountTypeOptions = ['SAVINGS', 'CHECKING', 'OTHER'] as const;
 
-  employeeId = signal('');
+  clientId = signal('');
 
   // ✅ Typed Form (esto arregla el error del template)
-  form: EmployeeEditForm = this.fb.group({
-    employeeCode: this.fb.control('', [Validators.required, Validators.maxLength(30)]),
-    status: this.fb.control<EmployeeStatus>('ACTIVE', [Validators.required]),
+  form: ClientEditForm = this.fb.group({
+    clientCode: this.fb.control('', [Validators.required, Validators.maxLength(30)]),
+    status: this.fb.control<ClientStatus>('ACTIVE', [Validators.required]),
 
     personal: this.fb.group({
       firstName: this.fb.control('', [Validators.required, Validators.maxLength(60)]),
@@ -149,7 +149,7 @@ export class EmployeeEditComponent {
     }),
 
     addresses: this.fb.array<AddressForm>([], [minArrayLength(1), requireOnePrimary()]),
-  }) as unknown as EmployeeEditForm;
+  }) as unknown as ClientEditForm;
 
   // Getters usados por tu HTML (tal cual)
   get contactGroup() {
@@ -337,17 +337,17 @@ export class EmployeeEditComponent {
     this.bankAccounts.markAsTouched();
   }
 
-  /** -------- Load employee by id -------- */
-  employee$ = this.route.paramMap.pipe(
+  /** -------- Load client by id -------- */
+  client$ = this.route.paramMap.pipe(
     map((p) => p.get('id') ?? ''),
     distinctUntilChanged(),
     tap((id) => {
-      this.employeeId.set(id);
+      this.clientId.set(id);
       this.loading.set(true);
       this.notFound.set(false);
     }),
     switchMap((id) =>
-      id ? this.employeeService.getEmployeeById(id).pipe(catchError(() => of(null))) : of(null),
+      id ? this.clientService.getClientById(id).pipe(catchError(() => of(null))) : of(null),
     ),
     tap((e) => {
       this.loading.set(false);
@@ -355,18 +355,18 @@ export class EmployeeEditComponent {
         this.notFound.set(true);
         return;
       }
-      this.patchFromEmployee(e);
+      this.patchFromClient(e);
     }),
   );
 
-  private patchFromEmployee(e: Employee) {
+  private patchFromClient(e: Client) {
     this.emails.clear();
     this.phones.clear();
     this.addresses.clear();
     this.bankAccounts.clear();
 
     this.form.patchValue({
-      employeeCode: e.employeeCode,
+      clientCode: e.clientCode,
       status: e.status,
       personal: {
         firstName: e.personal.firstName,
@@ -443,7 +443,7 @@ export class EmployeeEditComponent {
       return;
     }
 
-    const id = this.employeeId();
+    const id = this.clientId();
     if (!id) return;
 
     this.form.disable();
@@ -453,11 +453,11 @@ export class EmployeeEditComponent {
 
     console.log(payload);
     // TODO: update cuando lo tengas en el service
-    this.employeeService
-      .updateEmployee(id)
+    this.clientService
+      .updateClient(id)
       .pipe(
         tap(() => {
-          this.toastr.success('Empleado actualizado correctamente', 'Success');
+          this.toastr.success('Cliente actualizado correctamente', 'Success');
           this.saving.set(false);
           this.router.navigate(['../../detalle', id], { relativeTo: this.route });
         }),
@@ -470,7 +470,7 @@ export class EmployeeEditComponent {
   }
 
   cancel() {
-    const id = this.employeeId();
+    const id = this.clientId();
     if (id) this.router.navigate(['../detalle', id], { relativeTo: this.route });
     else this.router.navigate(['../'], { relativeTo: this.route });
   }

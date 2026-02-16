@@ -2,9 +2,9 @@
   <div className="grid grid-cols-1 @4xl:grid-cols-[1fr_320px] gap-6 laptop:gap-3 items-start">
     <div className="flex flex-col gap-6 self-start">
       <div data-testid="greeting-section">
-        <h2 class="text-2xl text-body-loud font-bold text-gray-950">Empleados</h2>
+        <h2 class="text-2xl text-body-loud font-bold text-gray-950">Clientes</h2>
         <p data-testid="greeting-description" className="text-body font-normal text-gray-500">
-          Lista de empleados de tu institución.
+          Lista de clientes de tu institución.
         </p>
       </div>
     </div>
@@ -20,7 +20,7 @@
     >
       <div class="flex items-center gap-2">
         <h6 class="text-h6 text-heading" data-testid="table-title">
-          Cantidad de empleados ({{ total }})
+          Cantidad de clientes ({{ total }})
         </h6>
       </div>
       @if (isAdmin) {
@@ -30,12 +30,12 @@
             class="font-semibold leading-3xl items-center justify-center cursor-pointer gap-2 px-2 py-1 text-sm border rounded-lg"
             routerLink="../registrar"
           >
-            Registrar Empleado
+            Registrar Cliente
           </button>
         </div>
       }
     </div>
 
-    <app-employee-list [employees]="data()" [isAdmin]="isAdmin" />
+    <app-client-list [clients]="data()" [isAdmin]="isAdmin" />
   </div>
 </div>

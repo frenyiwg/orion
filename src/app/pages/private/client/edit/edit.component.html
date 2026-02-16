@@ -1,6 +1,6 @@
 <section class="w-full">
   <!-- dispara la carga -->
-  @if (employee$ | async; as _e) {}
+  @if (client$ | async; as _e) {}
 
   @if (loading()) {
     <div class="rounded-2xl border border-neutral-200 bg-white p-6">
@@ -8,13 +8,13 @@
         <span
           class="inline-block h-5 w-5 rounded-full border-2 border-neutral-200 border-t-neutral-700 animate-spin"
         ></span>
-        <p class="text-sm text-neutral-600">Cargando empleado...</p>
+        <p class="text-sm text-neutral-600">Cargando cliente...</p>
       </div>
     </div>
   } @else {
     @if (notFound()) {
       <div class="rounded-2xl border border-neutral-200 bg-white p-6">
-        <p class="text-sm text-neutral-600">Empleado no encontrado.</p>
+        <p class="text-sm text-neutral-600">Cliente no encontrado.</p>
         <button
           class="mt-4 rounded-lg border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50"
           (click)="cancel()"
@@ -28,11 +28,11 @@
         <div class="rounded-2xl border border-neutral-200 bg-white p-4 sm:p-6">
           <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div class="min-w-0">
-              <h1 class="text-lg sm:text-xl font-semibold text-neutral-900">Editar empleado</h1>
+              <h1 class="text-lg sm:text-xl font-semibold text-neutral-900">Editar cliente</h1>
               <p class="text-sm text-neutral-600 truncate">
                 {{ form.controls.personal.controls.firstName.value }}
                 {{ form.controls.personal.controls.lastName.value }} ·
-                {{ form.controls.employeeCode.value }}
+                {{ form.controls.clientCode.value }}
               </p>
             </div>
 
@@ -75,13 +75,13 @@
                   >
                   <input
                     class="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2"
-                    formControlName="employeeCode"
+                    formControlName="clientCode"
                   />
 
-                  @if (hasError(form.controls.employeeCode, 'required')) {
+                  @if (hasError(form.controls.clientCode, 'required')) {
                     <p class="mt-1 text-xs text-rose-600">El código es requerido.</p>
                   }
-                  @if (hasError(form.controls.employeeCode, 'maxlength')) {
+                  @if (hasError(form.controls.clientCode, 'maxlength')) {
                     <p class="mt-1 text-xs text-rose-600">Máximo 30 caracteres.</p>
                   }
                 </label>

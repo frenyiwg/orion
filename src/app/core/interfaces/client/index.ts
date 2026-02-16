@@ -1,4 +1,4 @@
-export type EmployeeStatus = 'ACTIVE' | 'INACTIVE' | 'ON_LEAVE' | 'TERMINATED';
+export type ClientStatus = 'ACTIVE' | 'INACTIVE' | 'ON_LEAVE' | 'TERMINATED';
 export type Gender = 'MALE' | 'FEMALE' | 'OTHER' | 'NOT_SPECIFIED';
 export type MaritalStatus =
   | 'SINGLE'
@@ -50,7 +50,7 @@ export interface Identification {
   expiresAt: string | null; // YYYY-MM-DD o null
 }
 
-export interface EmployeePersonalInfo {
+export interface ClientPersonalInfo {
   firstName: string;
   middleName: string | null;
   lastName: string;
@@ -63,13 +63,13 @@ export interface EmployeePersonalInfo {
   identification: Identification;
 }
 
-export interface EmployeeEmail {
+export interface ClientEmail {
   type: EmailType;
   value: string;
   isPrimary: boolean;
 }
 
-export interface EmployeePhone {
+export interface ClientPhone {
   type: PhoneType;
   countryCode: string; // ej "+1"
   number: string;
@@ -78,14 +78,14 @@ export interface EmployeePhone {
   verifiedAt?: string | null; // ISO
 }
 
-export interface EmployeeContactInfo {
-  emails: EmployeeEmail[];
-  phones: EmployeePhone[];
+export interface ClientContactInfo {
+  emails: ClientEmail[];
+  phones: ClientPhone[];
   preferredLanguage?: string; // ej "es"
   timeZone?: string; // IANA (ej "America/Santo_Domingo")
 }
 
-export interface EmployeeAddress {
+export interface ClientAddress {
   id: string;
   type: AddressType;
   label?: string | null;
@@ -119,14 +119,14 @@ export interface WorkSchedule {
   workDays: WeekDay[];
 }
 
-export interface EmployeeLeave {
+export interface ClientLeave {
   type: LeaveType;
   startDate: string; // YYYY-MM-DD
   endDate?: string | null; // YYYY-MM-DD
   notes?: string | null;
 }
 
-export interface EmployeeEmploymentInfo {
+export interface ClientEmploymentInfo {
   company: string;
   department: string;
   team?: string | null;
@@ -144,7 +144,7 @@ export interface EmployeeEmploymentInfo {
   location: EmploymentLocation;
   schedule: WorkSchedule;
 
-  leave?: EmployeeLeave | null;
+  leave?: ClientLeave | null;
 }
 
 export interface BankAccount {
@@ -155,7 +155,7 @@ export interface BankAccount {
   isPrimary: boolean;
 }
 
-export interface EmployeeCompensation {
+export interface ClientCompensation {
   currency: string; // ISO-4217 (ej "DOP")
   baseSalary: number;
   payFrequency: 'WEEKLY' | 'BIWEEKLY' | 'MONTHLY' | 'YEARLY';
@@ -177,7 +177,7 @@ export interface PensionPlan {
   memberId?: string | null;
 }
 
-export interface EmployeeBenefits {
+export interface ClientBenefits {
   healthPlan?: HealthPlan | null;
   pension?: PensionPlan | null;
 }
@@ -193,7 +193,7 @@ export interface EmergencyContact {
   isPrimary: boolean;
 }
 
-export interface EmployeeDocument {
+export interface ClientDocument {
   type: DocumentType;
   fileName: string;
   status: DocumentStatus;
@@ -203,7 +203,7 @@ export interface EmployeeDocument {
   approvedAt?: string | null; // ISO
 }
 
-export interface EmployeeAsset {
+export interface ClientAsset {
   type: AssetType;
   tag: string;
   model?: string | null;
@@ -215,7 +215,7 @@ export interface SystemPermission {
   access: SystemAccess;
 }
 
-export interface EmployeePermissions {
+export interface ClientPermissions {
   roles: string[];
   systems: SystemPermission[];
 }
@@ -227,27 +227,27 @@ export interface AuditInfo {
   updatedBy?: string | null;
 }
 
-export interface Employee {
+export interface Client {
   id: string;
-  employeeCode: string;
-  status: EmployeeStatus;
+  clientCode: string;
+  status: ClientStatus;
 
-  personal: EmployeePersonalInfo;
-  contact: EmployeeContactInfo;
+  personal: ClientPersonalInfo;
+  contact: ClientContactInfo;
 
-  addresses: EmployeeAddress[];
+  addresses: ClientAddress[];
 
-  employment: EmployeeEmploymentInfo;
-  compensation: EmployeeCompensation;
+  employment: ClientEmploymentInfo;
+  compensation: ClientCompensation;
 
-  benefits?: EmployeeBenefits | null;
+  benefits?: ClientBenefits | null;
 
   emergencyContacts?: EmergencyContact[];
 
-  documents?: EmployeeDocument[];
-  assets?: EmployeeAsset[];
+  documents?: ClientDocument[];
+  assets?: ClientAsset[];
 
-  permissions?: EmployeePermissions;
+  permissions?: ClientPermissions;
 
   audit: AuditInfo;
 }

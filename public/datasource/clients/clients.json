@@ -2,7 +2,7 @@
   "data": [
     {
       "id": "emp-0001",
-      "employeeCode": "E-10001",
+      "clientCode": "E-10001",
       "status": "ACTIVE",
       "personal": {
         "firstName": "Ana",
@@ -189,7 +189,7 @@
     },
     {
       "id": "emp-0002",
-      "employeeCode": "E-10002",
+      "clientCode": "E-10002",
       "status": "ACTIVE",
       "personal": {
         "firstName": "Luis",
@@ -364,7 +364,7 @@
     },
     {
       "id": "emp-0003",
-      "employeeCode": "E-10003",
+      "clientCode": "E-10003",
       "status": "ON_LEAVE",
       "personal": {
         "firstName": "Carolina",

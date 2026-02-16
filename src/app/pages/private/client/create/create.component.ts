@@ -12,7 +12,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { catchError, of, tap } from 'rxjs';
-import { EmployeeService } from '@core/services';
+import { ClientService } from '@core/services';
 import { WeekDay } from '@core/interfaces';
 import { ToastrService } from 'ngx-toastr';
 import {
@@ -23,8 +23,8 @@ import {
   ControlMap,
   EmailForm,
   EmailType,
-  EmployeeEditForm,
-  EmployeeStatus,
+  ClientEditForm,
+  ClientStatus,
   EmploymentType,
   Gender,
   IdentificationType,
@@ -40,15 +40,15 @@ import {
 } from '../common';
 
 @Component({
-  selector: 'app-employee-create',
+  selector: 'app-client-create',
   templateUrl: 'create.component.html',
   imports: [ReactiveFormsModule],
 })
-export class EmployeeCreateComponent {
+export class ClientCreateComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly fb = inject(NonNullableFormBuilder);
-  private readonly employeeService = inject(EmployeeService);
+  private readonly clientService = inject(ClientService);
   private readonly toastr = inject(ToastrService);
 
   loading = signal(true);
@@ -74,9 +74,9 @@ export class EmployeeCreateComponent {
   bankAccountTypeOptions = ['SAVINGS', 'CHECKING', 'OTHER'] as const;
 
   // ✅ Typed Form (esto arregla el error del template)
-  form: EmployeeEditForm = this.fb.group({
-    employeeCode: this.fb.control('', [Validators.required, Validators.maxLength(30)]),
-    status: this.fb.control<EmployeeStatus>('ACTIVE', [Validators.required]),
+  form: ClientEditForm = this.fb.group({
+    clientCode: this.fb.control('', [Validators.required, Validators.maxLength(30)]),
+    status: this.fb.control<ClientStatus>('ACTIVE', [Validators.required]),
 
     personal: this.fb.group({
       firstName: this.fb.control('', [Validators.required, Validators.maxLength(60)]),
@@ -146,7 +146,7 @@ export class EmployeeCreateComponent {
     }),
 
     addresses: this.fb.array<AddressForm>([], [minArrayLength(1), requireOnePrimary()]),
-  }) as unknown as EmployeeEditForm;
+  }) as unknown as ClientEditForm;
 
   // Getters usados por tu HTML (tal cual)
   get contactGroup() {
@@ -347,11 +347,11 @@ export class EmployeeCreateComponent {
 
     console.log(payload);
 
-    this.employeeService
-      .createEmployee()
+    this.clientService
+      .createClient()
       .pipe(
         tap(() => {
-          this.toastr.success('Empleado creado correctamente', 'Success');
+          this.toastr.success('Cliente creado correctamente', 'Success');
           this.saving.set(false);
           this.router.navigate(['../lista'], { relativeTo: this.route });
         }),

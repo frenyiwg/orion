@@ -33,7 +33,7 @@ export function iso2or3Validator() {
 }
 
 /** ---------------- Typed Form Models ---------------- */
-export type EmployeeStatus = 'ACTIVE' | 'INACTIVE' | 'ON_LEAVE' | 'TERMINATED';
+export type ClientStatus = 'ACTIVE' | 'INACTIVE' | 'ON_LEAVE' | 'TERMINATED';
 export type Gender = 'MALE' | 'FEMALE' | 'OTHER' | 'NOT_SPECIFIED';
 export type MaritalStatus =
   | 'SINGLE'
@@ -92,9 +92,9 @@ export type BankAccountForm = FormGroup<{
   isPrimary: FormControl<boolean>;
 }>;
 
-export type EmployeeEditForm = FormGroup<{
-  employeeCode: FormControl<string>;
-  status: FormControl<EmployeeStatus>;
+export type ClientEditForm = FormGroup<{
+  clientCode: FormControl<string>;
+  status: FormControl<ClientStatus>;
 
   personal: FormGroup<{
     firstName: FormControl<string>;
