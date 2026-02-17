@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, effect } from '@angular/core';
 import { form, FormField, pattern, required } from '@angular/forms/signals';
 import { AuthService } from '@core/services';
 import { EMAIL_REGEX, TokenManager } from '@core/utils';
@@ -14,10 +14,15 @@ interface LoginData {
   selector: 'app-login',
   templateUrl: 'login.component.html',
   imports: [CommonModule, FormField],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
   private readonly authService = inject(AuthService);
+
+  constructor() {
+    effect(() => {
+      console.log('form change', this.loginModel);
+    });
+  }
 
   isLoading = signal(false);
   loginError = signal<string | null>(null);

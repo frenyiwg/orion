@@ -5,11 +5,14 @@ import { routes } from './app/app.routing';
 import { provideRouter, withHashLocation } from '@angular/router';
 import { provideAuthInitializer } from '@core/providers/common';
 import { provideToastr } from 'ngx-toastr';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { authInterceptor } from '@core/providers/interceptors/auth.interceptor';
 
 bootstrapApplication(App, {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, withHashLocation()),
+    provideHttpClient(withInterceptors([authInterceptor])),
     provideAuthInitializer(),
     provideToastr({
       timeOut: 10000,
